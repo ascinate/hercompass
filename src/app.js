@@ -81,6 +81,17 @@ app.get("/users", (req, res) => {
   });
 });
 
+app.get("/add-user", (req, res) => {
+  const user = req.session.user;
+  if (!user) return res.redirect("/login");
+
+  res.render("admin/add-user", {
+    title: "Add User",
+    user,
+  });
+});
+
+
 
 
 

@@ -10,6 +10,8 @@ import {
   loginUser,
   logoutUser,
 } from "../controllers/userController.js";
+import { getUserMetrics } from "../controllers/metricsController.js";
+
 
 const router = express.Router();
 
@@ -23,5 +25,7 @@ router.get("/logout", logoutUser); // 👈 add this
 router.post("/add", createUser);
 router.post("/update/:id", updateUser);
 router.get("/delete/:id", deleteUser);
+router.get("/metrics", getUserMetrics);
+
 
 export default router;
