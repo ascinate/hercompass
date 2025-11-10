@@ -7,11 +7,11 @@ dotenv.config();
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
   protocol: "postgres",
-  logging: false,
+  logging: console.log, // Optional: helpful for debugging
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // 🔥 This line tells Sequelize to accept self-signed certs
+      rejectUnauthorized: false, // 👈 critical: allows self-signed certs
     },
   },
 });
@@ -19,9 +19,9 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log("🗄️ PostgreSQL connected successfully via Sequelize (SSL enabled)");
+    console.log("🗄️ PostgreSQL connected successfully via SSL");
   } catch (error) {
-    console.error("❌ Database connection failed:", error.message);
+    console.error("❌ Database connection failed:", error);
     process.exit(1);
   }
 };
