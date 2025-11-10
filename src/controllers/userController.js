@@ -62,13 +62,10 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // 🔥 Plain password comparison (no bcrypt, no nonsense)
-    if (user.password.trim() !== password.trim()) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
+if (user.password !== password) {
+  return res.status(401).json({ success: false, message: "Invalid credentials" });
+}
+
 
     req.session.user = {
       id: user.id,
