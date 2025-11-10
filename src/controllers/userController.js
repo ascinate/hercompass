@@ -1,7 +1,7 @@
 // src/controllers/userController.js
 import User from "../models/User.js";
 import { Op } from "sequelize";
-import bcrypt from "bcryptjs";
+
 
 // 🟢 Get all users
 export const getAllUsers = async (req, res) => {
@@ -62,24 +62,14 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    let isMatch = false;
-
-    // 👇 If admin → compare plain password
-    if (user.role === "admin") {
-      isMatch = user.password === password;
-    } else {
-      // 👇 Everyone else → bcrypt check
-      isMatch = await bcrypt.compare(password, user.password);
-    }
-
-    if (!isMatch) {
+    // 🔥 Plain password comparison (no bcrypt, no nonsense)
+    if (user.password.trim() !== password.trim()) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
     }
 
-    // ✅ Save session
     req.session.user = {
       id: user.id,
       name: user.full_name,
@@ -93,13 +83,14 @@ export const loginUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("❌ Login error:", error);
+    console.error("❌ Login error:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error during login",
     });
   }
 };
+
 
 // 🔴 Logout user and redirect to login
 export const logoutUser = async (req, res) => {
