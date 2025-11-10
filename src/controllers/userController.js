@@ -1,7 +1,7 @@
 // src/controllers/userController.js
 import User from "../models/User.js";
 import { Op } from "sequelize";
-import bcrypt from "bcryptjs";
+
 
 // 🟢 Get all users
 export const getAllUsers = async (req, res) => {
@@ -42,6 +42,7 @@ export const getUserById = async (req, res) => {
 };
 
 
+// 🟢 Basic login (no hashing or JWT yet)
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -62,24 +63,13 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    let isMatch = false;
-
-    // 👇 If admin → compare plain password
-    if (user.role === "admin") {
-      isMatch = user.password === password;
-    } else {
-      // 👇 Everyone else → bcrypt check
-      isMatch = await bcrypt.compare(password, user.password);
-    }
-
-    if (!isMatch) {
+    if (user.password !== password) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
     }
 
-    // ✅ Save session
     req.session.user = {
       id: user.id,
       name: user.full_name,
@@ -93,13 +83,14 @@ export const loginUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("❌ Login error:", error);
+    console.error("❌ Login error:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error during login",
     });
   }
 };
+
 
 // 🔴 Logout user and redirect to login
 export const logoutUser = async (req, res) => {
@@ -179,6 +170,7 @@ export const getAdminsAndOthers = async (req, res) => {
 // Additional controller functions (createUser, updateUser, deleteUser) can be added here as needed.
 
 
+// 🟢 Create a new user
 export const createUser = async (req, res) => {
   try {
     const {
@@ -201,14 +193,10 @@ export const createUser = async (req, res) => {
       return res.status(409).json({ success: false, message: "Email already exists" });
     }
 
-    // 👇 Only hash if NOT admin
-    const finalPassword =
-      role === "admin" ? password : await bcrypt.hash(password, 10);
-
     const newUser = await User.create({
       full_name,
       email,
-      password: finalPassword,
+      password,
       gender,
       role,
       menopause_phase,
@@ -216,22 +204,10 @@ export const createUser = async (req, res) => {
       subscription_status,
     });
 
-    res.status(201).json({
-      success: true,
-      message: "User created successfully",
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        full_name: newUser.full_name,
-        role: newUser.role,
-      },
-    });
+    res.status(201).json({ success: true, message: "User created successfully", user: newUser });
   } catch (err) {
-    console.error("❌ Error creating user:", err);
-    res.status(500).json({
-      success: false,
-      message: "Server error while creating user",
-    });
+    console.error("❌ Error creating user:", err.message);
+    res.status(500).json({ success: false, message: "Server error while creating user" });
   }
 };
 // 🟢 Update user details
