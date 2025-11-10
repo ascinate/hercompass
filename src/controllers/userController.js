@@ -62,7 +62,16 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    let isMatch = false;
+
+    // 👇 If admin → compare plain password
+    if (user.role === "admin") {
+      isMatch = user.password === password;
+    } else {
+      // 👇 Everyone else → bcrypt check
+      isMatch = await bcrypt.compare(password, user.password);
+    }
+
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -184,27 +193,22 @@ export const createUser = async (req, res) => {
     } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
+      return res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
-  
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "Email already exists",
-      });
+      return res.status(409).json({ success: false, message: "Email already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // 👇 Only hash if NOT admin
+    const finalPassword =
+      role === "admin" ? password : await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       full_name,
       email,
-      password: hashedPassword,
+      password: finalPassword,
       gender,
       role,
       menopause_phase,
@@ -230,7 +234,6 @@ export const createUser = async (req, res) => {
     });
   }
 };
-
 // 🟢 Update user details
 // 🟢 Update an existing user
 export const updateUser = async (req, res) => {
