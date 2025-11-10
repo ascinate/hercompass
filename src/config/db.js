@@ -1,5 +1,7 @@
+// src/config/db.js
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -7,14 +9,17 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   protocol: "postgres",
   logging: false,
   dialectOptions: {
-    ssl: { require: true, rejectUnauthorized: false },
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // 🔥 This line tells Sequelize to accept self-signed certs
+    },
   },
 });
 
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log("🗄️ PostgreSQL connected successfully via Sequelize");
+    console.log("🗄️ PostgreSQL connected successfully via Sequelize (SSL enabled)");
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);
     process.exit(1);
