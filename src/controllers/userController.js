@@ -1,7 +1,7 @@
 // src/controllers/userController.js
 import User from "../models/User.js";
 import { Op } from "sequelize";
-
+import bcrypt from "bcryptjs";
 
 // 🟢 Get all users
 export const getAllUsers = async (req, res) => {
@@ -42,7 +42,6 @@ export const getUserById = async (req, res) => {
 };
 
 
-// 🟢 Basic login (no hashing or JWT yet)
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,13 +62,15 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    if (user.password !== password) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
     }
 
+    // ✅ Save session
     req.session.user = {
       id: user.id,
       name: user.full_name,
@@ -83,14 +84,13 @@ export const loginUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("❌ Login error:", error.message);
+    console.error("❌ Login error:", error);
     res.status(500).json({
       success: false,
       message: "Server error during login",
     });
   }
 };
-
 
 // 🔴 Logout user and redirect to login
 export const logoutUser = async (req, res) => {
@@ -170,7 +170,6 @@ export const getAdminsAndOthers = async (req, res) => {
 // Additional controller functions (createUser, updateUser, deleteUser) can be added here as needed.
 
 
-// 🟢 Create a new user
 export const createUser = async (req, res) => {
   try {
     const {
@@ -185,18 +184,27 @@ export const createUser = async (req, res) => {
     } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required" });
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
     }
 
+  
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(409).json({ success: false, message: "Email already exists" });
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       full_name,
       email,
-      password,
+      password: hashedPassword,
       gender,
       role,
       menopause_phase,
@@ -204,12 +212,25 @@ export const createUser = async (req, res) => {
       subscription_status,
     });
 
-    res.status(201).json({ success: true, message: "User created successfully", user: newUser });
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        full_name: newUser.full_name,
+        role: newUser.role,
+      },
+    });
   } catch (err) {
-    console.error("❌ Error creating user:", err.message);
-    res.status(500).json({ success: false, message: "Server error while creating user" });
+    console.error("❌ Error creating user:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error while creating user",
+    });
   }
 };
+
 // 🟢 Update user details
 // 🟢 Update an existing user
 export const updateUser = async (req, res) => {
