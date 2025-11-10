@@ -62,9 +62,9 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    if (user.password !== password) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
-    }
+if (user.password !== password) {
+  return res.status(401).json({ success: false, message: "Invalid credentials" });
+}
 
 
     req.session.user = {
@@ -168,7 +168,57 @@ export const getAdminsAndOthers = async (req, res) => {
 
 
 export const createUser = async (req, res) => {
-  try { const { full_name, email, password, gender, role = "user", menopause_phase, partner_id, subscription_status, } = req.body; if (!email || !password) { return res.status(400).json({ success: false, message: "Email and password are required" }); } const existingUser = await User.findOne({ where: { email } }); if (existingUser) { return res.status(409).json({ success: false, message: "Email already exists" }); } const newUser = await User.create({ full_name, email, password, gender, role, menopause_phase, partner_id, subscription_status, }); res.status(201).json({ success: true, message: "User created successfully", user: newUser }); } catch (err) { console.error("❌ Error creating user:", err.message); res.status(500).json({ success: false, message: "Server error while creating user" }); }
+  try {
+    const {
+      full_name,
+      email,
+      password,
+      gender,
+      role = "user",
+      menopause_phase,
+      partner_id,
+      subscription_status,
+    } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
+    }
+
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ success: false, message: "Email already exists" });
+    }
+
+   const finalPassword = password;
+
+    const newUser = await User.create({
+      full_name,
+      email,
+      password: finalPassword,
+      gender,
+      role,
+      menopause_phase,
+      partner_id,
+      subscription_status,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        full_name: newUser.full_name,
+        role: newUser.role,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Error creating user:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error while creating user",
+    });
+  }
 };
 // 🟢 Update user details
 // 🟢 Update an existing user
