@@ -86,14 +86,14 @@
                         <a href="#" class="nav-link dropdown-toggle d-flex align-items-center"
                             data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle fs-2 me-2"></i>
-                            <span class="d-none d-md-inline"><%= admin.name || "Guest User" %></span>
+                            <span class="d-none d-md-inline"><%= admin.full_name || "Guest User" %></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                             <!--begin::User Image-->
                             <li class="user-header text-bg-primary">
                                 <img src="./img/user2-160x160.jpg" class="rounded-circle shadow" alt="User Image" />
                                 <p>
-                                    <%= admin.name || "Guest User" %> - <%= admin.role || "N/A" %><br />
+                                    <%= admin.full_name || "Guest User" %> - <%= admin.role || "N/A" %><br />
                                             <small>Member since Nov. 2023</small>
                                 </p>
                             </li>

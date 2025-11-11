@@ -120,11 +120,7 @@ export const logoutUser = async (req, res) => {
 // 🟢 Get users with role = 'user' or 'partner'
 export const getNormalUsersAndPartners = async (req, res) => {
   try {
-    const users = await User.findAll({
-      where: {
-        role: ["user", "partner"],
-      },
-    });
+    const users = await User.findAll();
 
     res.status(200).json({
       success: true,
@@ -207,7 +203,6 @@ export const createUser = async (req, res) => {
         id: newUser.id,
         email: newUser.email,
         full_name: newUser.full_name,
-        role: newUser.role,
       },
     });
   } catch (err) {

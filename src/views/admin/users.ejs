@@ -104,12 +104,7 @@
                                     <th>Partner Linked</th>
                                     <td id="modalUserPartner">-</td>
                                 </tr>
-                                <tr>
-                                    <th>Role</th>
-                                    <td id="modalUserRole">-</td>
-                                    <th>Subscription</th>
-                                    <td id="modalUserSubscription">-</td>
-                                </tr>
+                               
                                 <tr>
                                     <th>Created At</th>
                                     <td id="modalUserCreated">-</td>
@@ -294,7 +289,6 @@
                     document.getElementById("modalUserGender").textContent = user.gender || "-";
                     document.getElementById("modalUserStage").textContent = user.menopause_phase || "-";
                     document.getElementById("modalUserPartner").textContent = user.partner_id ? "Yes" : "No";
-                    document.getElementById("modalUserRole").textContent = user.role || "-";
                     document.getElementById("modalUserSubscription").textContent = user.subscription_status || "-";
                     document.getElementById("modalUserCreated").textContent = formatDateTime(user.created_at);
                     document.getElementById("modalUserLastActive").textContent = formatDateTime(user.last_active);

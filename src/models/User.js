@@ -21,10 +21,6 @@ const User = sequelize.define(
     gender: {
       type: DataTypes.ENUM("female", "male", "other"),
     },
-    role: {
-      type: DataTypes.ENUM("user", "partner", "clinician", "admin"),
-      defaultValue: "user",
-    },
     menopause_phase: {
       type: DataTypes.ENUM("peri", "menopause", "post"),
     },
