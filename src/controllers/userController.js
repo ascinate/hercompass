@@ -140,7 +140,7 @@ export const getNormalUsersAndPartners = async (req, res) => {
   }
 };
 
-
+// 🟢 Get admins and other roles (excluding 'user' & 'partner')
 export const getAdminsAndOthers = async (req, res) => {
   try {
     const users = await User.findAll({
@@ -164,7 +164,7 @@ export const getAdminsAndOthers = async (req, res) => {
     });
   }
 };
-
+// Additional controller functions (createUser, updateUser, deleteUser) can be added here as needed.
 
 
 export const createUser = async (req, res) => {

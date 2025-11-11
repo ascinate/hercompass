@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
 import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -39,55 +40,79 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
-  const user = req.session.user;
+  const admin = req.session.admin;
 
-  if (!user) {
+  if (!admin) {
     return res.redirect("/login");
   }
 
   res.render("admin/dashboard", {
     title: "Dashboard",
-    user,
+    admin,
   });
 });
 
 app.get("/admins", (req, res) => {
-  const user = req.session.user;
+  const admin = req.session.admin;
 
-  if (!user) {
+  if (!admin) {
     return res.redirect("/login");
   }
 
   res.render("admin/admins", {
     title: "Admins",
-    user, // pass to EJS
+    admin, // pass to EJS
   });
 });
 
 app.get("/users", (req, res) => {
-  const user = req.session.user;
+  const admin = req.session.admin;
 
-  if (!user) {
+  if (!admin) {
     return res.redirect("/login");
   }
 
   res.render("admin/users", {
     title: "Users",
-    user, // pass to EJS
+    admin, // pass to EJS
   });
 });
 
 app.get("/add-user", (req, res) => {
-  const user = req.session.user;
-  if (!user) return res.redirect("/login");
-
   res.render("admin/add-user", {
     title: "Add User",
-    user,
+    admin: req.session.admin || null,
+  });
+});
+
+app.get("/growth", (req, res) => {
+  const admin = req.session.admin;
+ 
+  if (!admin) {
+    return res.redirect("/login");
+  }
+ 
+  res.render("admin/growth", {
+    title: "Dashboard",
+    admin,
+  });
+});
+ 
+app.get("/engagement", (req, res) => {
+  const admin = req.session.admin;
+ 
+  if (!admin) {
+    return res.redirect("/login");
+  }
+ 
+  res.render("admin/engagement", {
+    title: "Dashboard",
+    admin,
   });
 });
 
 
 app.use("/api/users", userRoutes);
+app.use("/api/admins", adminRoutes);
 
 export default app;
