@@ -4,13 +4,13 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
-import userRoutes from "./routes/userRoutes.js"; // ✅ import routes
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
 app.use(
   session({
-    secret: "super-secret-key", // change to something strong
+    secret: "super-secret-key",
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false,
@@ -18,26 +18,20 @@ app.use(
      },
   })
 );
-
-// ✅ Fix for __dirname (since ES Modules don’t have it)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Serve static files (CSS, JS, etc.)
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ Set view engine to EJS
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// ✅ UI Routes
 app.get("/", (req, res) => {
-  res.redirect("/login"); // Redirect root to login page
+  res.redirect("/login");
 });
 
 app.get("/login", (req, res) => {
@@ -53,7 +47,7 @@ app.get("/dashboard", (req, res) => {
 
   res.render("admin/dashboard", {
     title: "Dashboard",
-    user, // pass to EJS
+    user,
   });
 });
 
@@ -94,10 +88,6 @@ app.get("/add-user", (req, res) => {
 });
 
 
-
-
-
-// ✅ API Routes
 app.use("/api/users", userRoutes);
 
 export default app;
