@@ -13,7 +13,9 @@ app.use(
     secret: "super-secret-key", // change to something strong
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // true only if using HTTPS
+    cookie: { secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+     },
   })
 );
 
