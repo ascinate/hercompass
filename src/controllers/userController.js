@@ -145,7 +145,9 @@ export const getAdminsAndOthers = async (req, res) => {
   try {
     const users = await User.findAll({
       where: {
-        role: ["user"],
+        role: {
+          [Op.notIn]: ["user", "partner"],
+        },
       },
     });
 
