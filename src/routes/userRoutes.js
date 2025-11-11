@@ -21,7 +21,7 @@ router.get("/find/:id", getUserById);
 router.get("/regulars", getNormalUsersAndPartners); // for 'user' and 'partner'
 router.get("/admins", getAdminsAndOthers);          // for 'admin' and others
 router.post("/login", loginUser);
-router.get("/logout", logoutUser); // 👈 add this
+router.get("/logout", logoutUser);
 router.post("/add", createUser);
 router.post("/update/:id", updateUser);
 router.get("/delete/:id", deleteUser);

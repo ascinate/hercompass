@@ -107,7 +107,7 @@
                 // Fetch admins
                 async function loadAdmins() {
                     try {
-                        const res = await fetch("http://localhost:5000/api/users/admins");
+                        const res = await fetch("https://hercompass.onrender.com/api/users/admins");
                         const data = await res.json();
                         if (!data.success || !data.data.length) {
                             tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No admin users found.</td></tr>`;
