@@ -145,7 +145,7 @@ export const getAdminsAndOthers = async (req, res) => {
   try {
     const users = await User.findAll({
       where: {
-        role: ["admin"],
+        role: ["user"],
       },
     });
 
