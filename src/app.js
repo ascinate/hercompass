@@ -111,6 +111,19 @@ app.get("/engagement", (req, res) => {
   });
 });
 
+app.get("/cpstools", (req, res) => {
+  const admin = req.session.admin;
+ 
+  if (!admin) {
+    return res.redirect("/login");
+  }
+ 
+  res.render("admin/cpstools", {
+    title: "Dashboard",
+    admin,
+  });
+});
+
 
 app.use("/api/users", userRoutes);
 app.use("/api/admins", adminRoutes);

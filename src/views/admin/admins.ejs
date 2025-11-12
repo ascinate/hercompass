@@ -105,10 +105,6 @@
                 const adminModal = new bootstrap.Modal(document.getElementById("adminModal"));
                 const adminForm = document.getElementById("adminForm");
 
-                // Format date/time
-                
-
-                // Fetch admins
                 async function loadAdmins() {
                     try {
                         const res = await fetch("http://localhost:5000/api/admins");

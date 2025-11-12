@@ -7,7 +7,7 @@ const User = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4, // same as gen_random_uuid()
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     email: {
@@ -24,11 +24,23 @@ const User = sequelize.define(
     menopause_phase: {
       type: DataTypes.ENUM("peri", "menopause", "post"),
     },
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: "user",
+    },
+    diet_preferences: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+    linked_user: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
     partner_id: {
       type: DataTypes.UUID,
       allowNull: true,
       references: {
-        model: "Users", // table name
+        model: "Users",
         key: "id",
       },
       onDelete: "SET NULL",
@@ -37,6 +49,36 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    diet_style: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    fitness_level: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    moods: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+    goals: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+    partner_email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    partner_consent: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+
     created_at: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW,
@@ -70,11 +112,10 @@ const User = sequelize.define(
   },
   {
     tableName: "users",
-    timestamps: false, // since you’re using created_at / updated_at manually
+    timestamps: false,
   }
 );
 
-// Optional: self-association for partner_id
 User.belongsTo(User, { as: "partner", foreignKey: "partner_id" });
 
 export default User;

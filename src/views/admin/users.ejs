@@ -106,6 +106,8 @@
                                 </tr>
                                
                                 <tr>
+                                    <th>Subscription</th>
+                                    <td id="modalUserSubscription">-</td>
                                     <th>Created At</th>
                                     <td id="modalUserCreated">-</td>
                                     <th>Last Active</th>
@@ -198,7 +200,6 @@
                 })}, ${timeString}`;
             }
 
-            // ✅ Fetch and display users
             document.addEventListener("DOMContentLoaded", async () => {
                 const tableBody = document.getElementById("regularUsersTableBody");
 
@@ -333,6 +334,7 @@
                     try {
                         const res = await fetch(`http://localhost:5000/api/users/find/${userId}`);
                         const data = await res.json();
+                        
                         if (data.success) {
                             populateUserModal(data.user);
                         } else {

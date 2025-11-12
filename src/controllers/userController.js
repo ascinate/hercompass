@@ -28,6 +28,7 @@ export const getUserById = async (req, res) => {
   try {
     // Fetch the entire user record
     const user = await User.findByPk(userId);
+    console.log("Fetched user:", user?.toJSON());
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -213,6 +214,62 @@ export const createUser = async (req, res) => {
     });
   }
 };
+
+
+
+export const registerWithOnboarding = async (req, res) => {
+  try {
+    const {
+      full_name,
+      email,
+      password,
+      gender,
+      menopause_phase,
+      diet_style,
+      fitness_level,
+      moods,
+      goals,
+      invite_partner_email,
+      invite_partner_consent,
+    } = req.body;
+
+    // Check required fields
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
+    }
+
+    // Prevent duplicate
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ success: false, message: "Email already exists" });
+    }
+
+    const newUser = await User.create({
+      full_name,
+      email,
+      password,
+      gender,
+      menopause_phase,
+      diet_preferences: [diet_style],
+      fitness_level,
+      moods,
+      goals,
+      invite_partner_email,
+      invite_partner_consent,
+      role: "user",
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User registered + onboarded successfully",
+      user: newUser,
+    });
+  } catch (error) {
+    console.error("❌ Registration + Onboarding error:", error.message);
+    res.status(500).json({ success: false, message: "Server error while onboarding user" });
+  }
+};
+
 // 🟢 Update user details
 // 🟢 Update an existing user
 export const updateUser = async (req, res) => {

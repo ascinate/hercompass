@@ -1,0 +1,447 @@
+<%- include("../components/adminHeader", { title: title }) %>
+
+    <%- include("../components/adminSidebar") %>
+
+        <main class="app-main">
+            <!--begin::App Content Header-->
+            <div class="app-content-header">
+                <!--begin::Container-->
+                <div class="container-fluid">
+                    <!--begin::Row-->
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">CPS Tools</h3>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-end gap-2 mb-0">
+                                <!-- <button class="btn btn-primary">Button 1</button> -->
+                                <!-- 1. Date Range Selector -->
+                                <!-- Date Range Button -->
+                                <button type="button" class="btn btn-primary rounded-3 px-3">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Reset Partner Links
+                                </button>
+
+                                <!-- Segment Button -->
+                                <button type="button" class="btn btn-primary rounded-3 px-3">
+                                    <i class="bi bi-send-fill me-1"></i> Send Partner Digest
+                                </button>
+
+                                <!-- 3. Export / Share -->
+                                <div class="dropdown ms-auto">
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle"
+                                        data-bs-toggle="dropdown">
+                                        Export
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-filetype-csv me-2"></i>
+                                                Export as CSV</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-filetype-pdf me-2"></i>
+                                                Export as PDF</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-share me-2"></i> Copy
+                                                Dashboard Link</a></li>
+                                    </ul>
+                                </div>
+                            </ol>
+                        </div>
+                    </div>
+                    <!--end::Row-->
+                </div>
+                <!--end::Container-->
+            </div>
+            <!--end::App Content Header-->
+            <!--begin::App Content-->
+            <div class="app-content">
+                <!--begin::Container-->
+                <div class="container-fluid">
+                    <!--begin::Row-->
+                    <!-- Row 2: Partner Metrics -->
+                    <div class="row g-3">
+                        <!-- Card 1: Number of Partners -->
+                        <div class="col-lg-3 col-12">
+                            <div class="card text-white position-relative"
+                                style="background-color:#17a2b8; border:none; border-radius:10px; overflow:hidden;">
+                                <div class="card-body">
+                                    <h3 class="fw-bold mb-1">120</h3>
+                                    <p class="mb-0">Number of Partners</p>
+                                    <span class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                        style="font-size:3rem; opacity:0.3;">
+                                        <i class="bi bi-person-heart"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Partner Activation Rate -->
+                        <div class="col-lg-3 col-12">
+                            <div class="card text-white position-relative"
+                                style="background-color:#6f42c1; border:none; border-radius:10px;">
+                                <div class="card-body">
+                                    <h3 class="fw-bold mb-1">72%</h3>
+                                    <p class="mb-0">Partner Activation Rate</p>
+                                    <span class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                        style="font-size:3rem; opacity:0.3;">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Digest Open Rate -->
+                        <div class="col-lg-3 col-12">
+                            <div class="card text-white position-relative"
+                                style="background-color:#20c997; border:none; border-radius:10px;">
+                                <div class="card-body">
+                                    <h3 class="fw-bold mb-1">58%</h3>
+                                    <p class="mb-0">Digest Open Rate</p>
+                                    <span class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                        style="font-size:3rem; opacity:0.3;">
+                                        <i class="bi bi-envelope-open-fill"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-12">
+                            <div class="card text-danger position-relative"
+                                style="background-color:#ffcccc; border:none; border-radius:10px;">
+                                <div class="card-body">
+                                    <h3 class="fw-bold mb-1"><i class="bi bi-arrow-down"></i>8%</h3>
+                                    <p class="mb-0">Digest Open Rate Drops</p>
+                                    <span class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                        style="font-size:3rem; opacity:0.3;">
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+
+                    <!--end::Row-->
+                    <div class="row g-4 mt-2 mb-4">
+                        <!-- User Consents Table -->
+                        <div class="col-6 d-flex">
+                            <div class="card dashboard-card flex-fill h-100 shadow-sm ">
+                                <div
+                                    class="card-header dashboard-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">User Consents</h5>
+
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="text" id="partnerFilter"
+                                            class="form-control form-control-sm d-inline w-auto"
+                                            placeholder="Filter by Partner ID">
+
+                                        <!-- Export Dropdown -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-primary dropdown-toggle pb-0" type="button"
+                                                id="exportConsentDropdown" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="bi bi-download me-1"></i> Export As
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby="exportConsentDropdown">
+                                                <li><a class="dropdown-item" href="#" id="exportCsv">CSV</a></li>
+                                                <li><a class="dropdown-item" href="#" id="exportExcel">Excel</a></li>
+                                                <li><a class="dropdown-item" href="#" id="exportPdf">PDF</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="dashboard-body table-responsive p-3 bg-white">
+                                    <table class="table table-striped table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>User ID</th>
+                                                <th>Partner ID</th>
+                                                <th>Scopes</th>
+                                                <th>Created At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="consentTableBody">
+                                            <tr>
+                                                <td>U001</td>
+                                                <td>P001</td>
+                                                <td>email, profile</td>
+                                                <td>2025-11-10</td>
+                                            </tr>
+                                            <tr>
+                                                <td>U002</td>
+                                                <td>P002</td>
+                                                <td>email</td>
+                                                <td>2025-11-11</td>
+                                            </tr>
+                                            <tr>
+                                                <td>U003</td>
+                                                <td>P001</td>
+                                                <td>profile, transactions</td>
+                                                <td>2025-11-12</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Couple Challenges Table -->
+                        <div class="col-6 d-flex">
+                            <div class="card dashboard-card flex-fill h-100 shadow-sm ">
+                                <div
+                                    class="card-header dashboard-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Couple Challenges</h5>
+
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="text" id="challengeFilter"
+                                            class="form-control form-control-sm d-inline w-auto"
+                                            placeholder="Filter by Title">
+
+                                        <button class="btn btn-sm btn-success pb-0" id="addChallengeBtn">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Challenge
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="dashboard-body table-responsive p-3 bg-white">
+                                    <table class="table table-striped table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col">Title</th>
+                                                <th scope="col">Duration</th>
+                                                <th scope="col">XP Reward</th>
+                                                <th scope="col" class="text-center" style="width: 120px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="challengeTableBody">
+                                            <tr>
+                                                <td>Morning Workout</td>
+                                                <td>7 Days</td>
+                                                <td>500 XP</td>
+                                                <td class="text-center">
+                                                    <button class="btn btn-sm btn-outline-primary me-1 pb-0"
+                                                        title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger pb-0" title="Delete">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Healthy Eating</td>
+                                                <td>14 Days</td>
+                                                <td>800 XP</td>
+                                                <td class="text-center">
+                                                    <button class="btn btn-sm btn-outline-primary me-1 pb-0"
+                                                        title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger pb-0" title="Delete">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <script>
+                        // Quick filter for Partner ID
+                        document.getElementById('partnerFilter').addEventListener('input', function () {
+                            const filter = this.value.toLowerCase();
+                            const rows = document.querySelectorAll('#consentTableBody tr');
+                            rows.forEach(row => {
+                                const partnerId = row.cells[1].textContent.toLowerCase();
+                                row.style.display = partnerId.includes(filter) ? '' : 'none';
+                            });
+                        });
+                    </script>
+
+
+                    <!-- ======= ACQUISITION + REFERRAL SECTION ======= -->
+                    <div class="row g-4  mb-4">
+                        <!-- A. Couple Challenges: Active vs Completed -->
+                        <div class="col-lg-6 d-flex">
+                            <div class="card dashboard-card flex-fill">
+                                <div
+                                    class="card-header dashboard-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Couple Challenges: Active vs Completed</h5>
+                                    <select class="form-select form-select-sm w-auto">
+                                        <option>Last 7 Days</option>
+                                        <option>Last 30 Days</option>
+                                        <option>All Time</option>
+                                    </select>
+                                </div>
+                                <div class="dashboard-body d-flex flex-column justify-content-center align-items-center text-center"
+                                    style="min-height: 150px;">
+                                    <div class="d-flex justify-content-center align-items-center text-center gap-4">
+                                        <div>
+                                            <h2 class="fw-bold text-primary mb-0">24</h2>
+                                            <small class="text-muted">Active Challenges</small>
+                                        </div>
+
+                                        <div class="vr mx-3" style="height: 40px; opacity: 0.2;"></div>
+
+                                        <div>
+                                            <h2 class="fw-bold text-success mb-0">56</h2>
+                                            <small class="text-muted">Completed Challenges</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="progress w-75 mt-3" style="height: 10px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 30%;"
+                                            aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 70%;"
+                                            aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted mt-2">30% Active • 70% Completed</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B. Top Performing Challenges & Joint XP -->
+                        <div class="col-lg-6 d-flex">
+                            <div class="card dashboard-card flex-fill">
+                                <div
+                                    class="card-header dashboard-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Top Performing Challenges</h5>
+                                    <select class="form-select form-select-sm w-auto">
+                                        <option>Last 7 Days</option>
+                                        <option>Last 30 Days</option>
+                                        <option>All Time</option>
+                                    </select>
+                                </div>
+                                <div class="dashboard-body d-flex flex-column justify-content-between"
+                                    style="min-height: 150px;">
+                                    <!-- <div class="table-responsive">
+                                        <table class="table table-striped table-hover align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Challenge</th>
+                                                    <th>Completions</th>
+                                                    <th>Avg Joint XP</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Morning Gratitude</td>
+                                                    <td>132</td>
+                                                    <td>240 XP</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Budget Together</td>
+                                                    <td>95</td>
+                                                    <td>310 XP</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Weekend Disconnect</td>
+                                                    <td>88</td>
+                                                    <td>280 XP</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div> -->
+                                    <div class="text-center mt-4 mb-2">
+                                        <h6 class="text-muted mb-1">Total Joint XP Awarded</h6>
+                                        <h1 class="fw-bold text-primary mb-0">12,450 XP</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="row g-4 mb-4">
+                       
+                        <div class="col-lg-6 d-flex">
+                            <div class="card dashboard-card flex-fill">
+                                <div
+                                    class="card-header dashboard-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Controls</h5>
+                                </div>
+
+                                <div
+                                    class="card-body dashboard-body d-flex flex-column justify-content-center align-items-center p-3">
+                                    <div class="container">
+                                        <div class="row mb-2">
+                                            <div class="col-6 d-grid">
+                                                <button class="btn btn-primary w-100">Manage Couple Challange</button>
+                                            </div>
+                                            <div class="col-6 d-grid">
+                                                <button class="btn btn-primary w-100">Button 2</button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 d-grid">
+                                                <button class="btn btn-primary w-100">Button 3</button>
+                                            </div>
+                                            <div class="col-6 d-grid">
+                                                <button class="btn btn-primary w-100">Button 4</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                       
+                        <div class="col-lg-6 d-flex">
+                            <div class="card dashboard-card flex-fill">
+                                <div
+                                    class="card-header dashboard-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Alarts</h5>
+
+                                </div>
+                                <div class="dashboard-body d-flex flex-column justify-content-between"
+                                    style="min-height: 150px;">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+
+
+                    <!-- /.row (main row) -->
+                </div>
+                <!--end::Container-->
+            </div>
+            <!--end::App Content-->
+        </main>
+
+        <!-- Generate code -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const input = document.getElementById("promoCodeInput");
+                const generateBtn = document.getElementById("generateCodeBtn");
+
+                generateBtn.addEventListener("click", function () {
+                    // Prefix list (you can customize)
+                    const prefixes = ["PROMO", "COMMU", "DEAL", "SAVE", "OFFER", "SUMM"];
+                    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+
+                    // Generate 4–digit alphanumeric code
+                    const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                    // Combine
+                    const code = `${prefix}-${randomPart}`;
+
+                    // Set it to input
+                    input.value = code;
+
+                    // Optional: add small visual feedback
+                    input.classList.add("border-success");
+                    setTimeout(() => input.classList.remove("border-success"), 600);
+                });
+            });
+        </script>
+
+
+        <%- include("../components/adminFooter") %>
