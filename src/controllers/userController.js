@@ -270,8 +270,6 @@ export const registerWithOnboarding = async (req, res) => {
   }
 };
 
-// 🟢 Update user details
-// 🟢 Update an existing user
 export const updateUser = async (req, res) => {
   const userId = req.params.id;
   try {
@@ -309,8 +307,7 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error while updating user" });
   }
 };
-// 🟢 Delete a user
-// 🔴 Delete a user
+
 export const deleteUser = async (req, res) => {
   const userId = req.params.id;
   try {

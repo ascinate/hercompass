@@ -6,6 +6,8 @@ import { fileURLToPath } from "url";
 import session from "express-session";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+
 
 const app = express();
 
@@ -39,18 +41,6 @@ app.get("/login", (req, res) => {
   res.render("login", { title: "Login" });
 });
 
-app.get("/dashboard", (req, res) => {
-  const admin = req.session.admin;
-
-  if (!admin) {
-    return res.redirect("/login");
-  }
-
-  res.render("admin/dashboard", {
-    title: "Dashboard",
-    admin,
-  });
-});
 
 app.get("/admins", (req, res) => {
   const admin = req.session.admin;
@@ -127,5 +117,7 @@ app.get("/cpstools", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/admins", adminRoutes);
+
+app.use("/dashboard", dashboardRoutes);
 
 export default app;

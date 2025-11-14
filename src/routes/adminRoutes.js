@@ -21,4 +21,6 @@ router.put("/update/:id", updateAdmin);
 router.delete("/delete/:id", deleteAdmin);
 
 
+
+
 export default router;

@@ -1,6 +1,7 @@
 
 import Admin from "../models/Admin.js";
 
+
 // 🟢 Get all admins
 export const getAllAdmins = async (req, res) => {
   try {
@@ -103,7 +104,7 @@ export const loginAdmin = async (req, res) => {
       role: admin.role,
       email: admin.email,
     };
-
+  
     res.status(200).json({ success: true, message: "Admin login successful", admin });
   } catch (error) {
     console.error("❌ Login error:", error.message);
@@ -124,3 +125,4 @@ export const logoutAdmin = async (req, res) => {
     res.status(500).send("Error during admin logout");
   }
 };
+
