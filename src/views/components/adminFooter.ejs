@@ -265,6 +265,13 @@
         })}, ${timeString}`;
     }
 </script>
+
+<script>
+document.getElementById("exportUsersBtn").addEventListener("click", () => {
+    window.location.href = "http://localhost:5000/api/users/export";
+});
+</script>
+
 <!-- end:functions -->
 
 <!--end::Script-->

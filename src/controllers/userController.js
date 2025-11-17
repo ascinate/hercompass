@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import { Op } from "sequelize";
 import sequelize from "../config/db.js";
 import { QueryTypes } from "sequelize";
+import { Parser } from "json2csv";
 
 
 // 🟢 Get all users
@@ -377,3 +378,37 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error while deleting user" });
   }
 };
+
+
+export const exportUsers = async (req, res) => {
+  try {
+    const users = await User.findAll();
+
+    if (!users.length) {
+      return res.status(404).json({ success: false, message: "No users found" });
+    }
+
+    const rows = users.map((u) => ({
+      id: u.id,
+      full_name: u.full_name,
+      email: u.email,
+      gender: u.gender,
+      menopause_phase: u.menopause_phase,
+      partner_id: u.partner_id,
+      subscription_status: u.subscription_status,
+      last_active: u.last_active,
+      created_at: u.created_at,
+    }));
+
+    const parser = new Parser();
+    const csv = parser.parse(rows);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("users_export.csv");
+    return res.send(csv);
+  } catch (err) {
+    console.error("Export error:", err);
+    res.status(500).json({ success: false, message: "Failed to export users" });
+  }
+};
+

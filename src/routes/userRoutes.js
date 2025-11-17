@@ -10,6 +10,7 @@ import {
   loginUser,
   logoutUser,
   registerWithOnboarding,
+  exportUsers,
 } from "../controllers/userController.js";
 import { getUserMetrics } from "../controllers/metricsController.js";
 
@@ -29,6 +30,8 @@ router.post("/add", createUser);
 router.post("/update/:id", updateUser);
 router.get("/delete/:id", deleteUser);
 router.get("/metrics", getUserMetrics);
+router.get("/export", exportUsers);
+
 
 
 export default router;
