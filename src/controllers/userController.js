@@ -1,6 +1,8 @@
 // src/controllers/userController.js
 import User from "../models/User.js";
 import { Op } from "sequelize";
+import sequelize from "../config/db.js";
+import { QueryTypes } from "sequelize";
 
 
 // 🟢 Get all users
@@ -34,8 +36,59 @@ export const getUserById = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    const partnerScopes = await sequelize.query(
+      `
+      SELECT consent, shared_fields, last_shared, partner_id
+      FROM partner_shares
+      WHERE user_id = :id
+      LIMIT 1
+      `,
+      {
+        replacements: { id: userId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const partnerData = partnerScopes.length ? partnerScopes[0] : null;
+
+     const logs = await sequelize.query(
+      `
+      SELECT 'activity' AS type, activity_type AS label, logged_at AS date
+      FROM activity_logs WHERE user_id = :id AND logged_at >= NOW() - INTERVAL '30 days'
+
+      UNION ALL
+
+      SELECT 'symptom', symptoms::text AS label, log_date AS date
+      FROM symptom_logs WHERE user_id = :id AND log_date >= NOW() - INTERVAL '30 days'
+
+      UNION ALL
+
+      SELECT 'meditation', session_type AS label, completed_at AS date
+      FROM meditations WHERE user_id = :id AND completed_at >= NOW() - INTERVAL '30 days'
+
+      ORDER BY date DESC
+      `,
+      {
+        replacements: { id: userId },
+        type: QueryTypes.SELECT
+      }
+    );
+
+    const forecasts = await sequelize.query(
+      `
+      SELECT created_at AS date, predicted_symptoms AS forecast, confidence
+      FROM predictive_logs
+      WHERE user_id = :id
+      ORDER BY created_at DESC
+      `,
+      {
+        replacements: { id: userId },
+        type: QueryTypes.SELECT
+      }
+    );
+
     // Return everything
-    res.json({ success: true, user });
+    res.json({ success: true, user,logs,forecasts, partner_scopes: partnerData, });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error" });

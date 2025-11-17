@@ -114,6 +114,19 @@ app.get("/cpstools", (req, res) => {
   });
 });
 
+app.get("/aimodels", (req, res) => {
+  const admin = req.session.admin;
+ 
+  if (!admin) {
+    return res.redirect("/login");
+  }
+ 
+  res.render("admin/aimodels", {
+    title: "Dashboard",
+    admin,
+  });
+});
+
 
 app.use("/api/users", userRoutes);
 app.use("/api/admins", adminRoutes);

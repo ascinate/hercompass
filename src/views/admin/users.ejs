@@ -104,7 +104,7 @@
                                     <th>Partner Linked</th>
                                     <td id="modalUserPartner">-</td>
                                 </tr>
-                               
+
                                 <tr>
                                     <th>Subscription</th>
                                     <td id="modalUserSubscription">-</td>
@@ -116,7 +116,32 @@
                             </tbody>
                         </table>
 
-                        <!-- RECENT LOGS -->
+
+                        <div class="mb-4">
+                            <h6 class="text-secondary">Partner Consent Scopes</h6>
+                            <table class="table table-sm table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th>Partner Linked</th>
+                                        <td id="modalPartnerLinked">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Consent Given</th>
+                                        <td id="modalPartnerConsent">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Allowed Fields</th>
+                                        <td id="modalPartnerFields">-</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Shared</th>
+                                        <td id="modalPartnerLastShared">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
                         <div class="mb-4">
                             <h6 class="text-secondary">Recent Logs (Last 30 Days)</h6>
                             <div class="table-responsive" style="max-height:200px; overflow-y:auto;">
@@ -277,13 +302,19 @@
                 const tableBody = document.getElementById("regularUsersTableBody");
                 const modal = new bootstrap.Modal(document.getElementById("userDetailModal"));
 
+
                 function formatDateTime(dateString) {
                     if (!dateString) return "-";
                     const date = new Date(dateString);
                     return date.toLocaleString();
                 }
 
-                function populateUserModal(user) {
+
+                function populateUserModal(data) {
+                    const user = data.user;
+                    const p = data.partner_scopes;
+
+
                     document.getElementById("modalUserId").textContent = user.id || "-";
                     document.getElementById("modalUserName").textContent = user.full_name || "-";
                     document.getElementById("modalUserEmail").textContent = user.email || "-";
@@ -294,32 +325,60 @@
                     document.getElementById("modalUserCreated").textContent = formatDateTime(user.created_at);
                     document.getElementById("modalUserLastActive").textContent = formatDateTime(user.last_active);
 
-                    // Logs
+                    document.getElementById("modalPartnerLinked").textContent =
+                        p?.partner_id ? "Yes" : "No";
+
+                    document.getElementById("modalPartnerConsent").textContent =
+                        p?.consent ? "Allowed" : "Not Allowed";
+
+                    document.getElementById("modalPartnerFields").textContent =
+                        p?.shared_fields?.length ? p.shared_fields.join(", ") : "-";
+
+                    document.getElementById("modalPartnerLastShared").textContent =
+                        p?.last_shared ? formatDateTime(p.last_shared) : "-";
+
+
                     const logsBody = document.getElementById("modalUserLogs");
-                    if (user.logs?.length) {
-                        logsBody.innerHTML = user.logs.map(log => `
+
+                    if (data.logs && data.logs.length > 0) {
+                        logsBody.innerHTML = data.logs
+                            .map(
+                                (log) => `
                 <tr>
                     <td>${formatDateTime(log.date)}</td>
                     <td>${log.type}</td>
-                    <td>${log.annotation}</td>
+                    <td>${log.label}</td>
                 </tr>
-            `).join("");
+            `
+                            )
+                            .join("");
                     } else {
-                        logsBody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">No logs found.</td></tr>`;
+                        logsBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No logs found.</td>
+                </tr>`;
                     }
 
-                    // Forecasts
+
                     const forecastsBody = document.getElementById("modalUserForecasts");
-                    if (user.forecasts?.length) {
-                        forecastsBody.innerHTML = user.forecasts.map(f => `
+
+                    if (data.forecasts && data.forecasts.length > 0) {
+                        forecastsBody.innerHTML = data.forecasts
+                            .map(
+                                (f) => `
                 <tr>
                     <td>${formatDateTime(f.date)}</td>
-                    <td>${f.forecast}</td>
-                    <td>${f.user_feedback || "-"}</td>
+                    <td>${JSON.stringify(f.forecast)}</td>
+                    <td>${f.confidence ?? "-"}</td>
                 </tr>
-            `).join("");
+            `
+                            )
+                            .join("");
                     } else {
-                        forecastsBody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">No forecasts found.</td></tr>`;
+                        forecastsBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No forecasts found.</td>
+                </tr>`;
                     }
 
                     modal.show();
@@ -334,19 +393,20 @@
                     try {
                         const res = await fetch(`http://localhost:5000/api/users/find/${userId}`);
                         const data = await res.json();
-                        
+
                         if (data.success) {
-                            populateUserModal(data.user);
+                            populateUserModal(data);
                         } else {
                             alert("Failed to fetch user details.");
                         }
                     } catch (err) {
-                        console.error(err);
+                        console.error("User detail fetch error:", err);
                         alert("Error fetching user details.");
                     }
                 });
             });
         </script>
+
 
 
 
