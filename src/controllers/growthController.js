@@ -32,10 +32,60 @@ export const growthDashboard = async(req,res)=>{
             { type: QueryTypes.SELECT }
         );
 
+        const [userLinked] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM users WHERE linked_user IS NOT NULL;`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [invitesSent] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM referrals;`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [accepted] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM referrals WHERE status = 'joined';`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [activated] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM referrals WHERE status = 'activated';`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [landing] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM users;`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [signup] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM users;`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [onboarding] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM users WHERE linked_user IS NOT NULL;`,
+            { type: QueryTypes.SELECT }
+        );
+ 
+        const [firstLog] = await sequelize.query(
+            `SELECT COUNT(*)::int FROM users WHERE logs_count_7d::int > 0;`,
+            { type: QueryTypes.SELECT }
+        );
+
         res.render("admin/growth", {
             title: "Growth & Acquisition",
             admin,
-            leaderboard
+            leaderboard,
+            stats: {
+                invitesSent: invitesSent.count || 0,
+                accepted: accepted.count || 0,
+                activated: activated.count || 0,
+                userLinked: userLinked.count || 0,
+                landing: landing.count || 0,
+                signup: signup.count || 0,
+                onboarding: onboarding.count || 0,
+                firstLog: firstLog.count || 0,
+            },
         });
 
     } catch (err) {

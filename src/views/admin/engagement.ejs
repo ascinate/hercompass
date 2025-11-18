@@ -324,34 +324,59 @@
                     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
                     <script>
                         // --- 1. Logging Frequency Heatmap ---
-                        const hours = [...Array(24).keys()];
+                        const rawHeatmap = <%- JSON.stringify(stats.heatmapData) %>;
+
+                        const hours = [...Array(24).keys()].map(h => `${h}:00`);
                         const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+                        // Structure to fill zeros for missing hours
+                        const heatmapMap = {};
+                        weekdays.forEach(day => {
+                            heatmapMap[day] = Array(24).fill(0);
+                        });
+
+                        // Fill with DB values
+                        rawHeatmap.forEach(row => {
+                            const day = row.weekday;
+                            const hour = row.hour;
+                            if (heatmapMap[day]) {
+                                heatmapMap[day][hour] = row.login_count;
+                            }
+                        });
+
+                        // Convert to ApexCharts series
                         const heatSeries = weekdays.map(day => ({
                             name: day,
-                            data: hours.map(() => Math.floor(Math.random() * 50) + 5)
+                            data: heatmapMap[day]
                         }));
+
                         new ApexCharts(document.querySelector("#loggingHeatmap"), {
                             chart: { type: 'heatmap', height: 220 },
                             colors: ['#007bff'],
                             dataLabels: { enabled: false },
                             series: heatSeries,
-                            xaxis: { categories: hours.map(h => `${h}:00`) },
+                            xaxis: { categories: hours },
                             tooltip: {
                                 y: {
-                                    formatter: val => `${val} logins (${(Math.random() * 20 - 10).toFixed(1)}% vs prev week)`
+                                    formatter: val => `${val} logins`
                                 }
                             }
                         }).render();
 
                         // --- 2. Retention Cohorts (LTV & Retention %) ---
+
+                        const retentionCategories = <%- JSON.stringify(stats.chorts.categories) %>;
+                        const retentionSeries = <%- JSON.stringify(stats.chorts.retention_series) %>;
+                        const ltvSeries = <%- JSON.stringify(stats.chorts.ltv_series) %>;
+
                         new ApexCharts(document.querySelector("#retentionChart"), {
                             chart: { type: 'line', height: 220, toolbar: { show: false } },
                             series: [
-                                { name: '% Retained', data: [65, 60, 58, 54, 50, 48, 45] },
-                                { name: 'LTV (₹)', data: [480, 460, 450, 430, 410, 400, 390] }
+                                { name: '% Retained', data: retentionSeries },
+                                { name: 'LTV (₹)', data: ltvSeries }
                             ],
                             colors: ['#28a745', '#ffc107'],
-                            xaxis: { categories: ['Cohort 1', 'Cohort 2', 'Cohort 3', 'Cohort 4', 'Cohort 5', 'Cohort 6', 'Cohort 7'] },
+                            xaxis: { categories: retentionCategories },
                             yaxis: [{ title: { text: '% Retained' } }, { opposite: true, title: { text: 'LTV' } }],
                             tooltip: { shared: true, intersect: false }
                         }).render();
@@ -360,7 +385,13 @@
                         new ApexCharts(document.querySelector("#streaksBar"), {
                             chart: { type: 'bar', height: 220 },
                             plotOptions: { bar: { horizontal: true } },
-                            series: [{ name: '% Users', data: [45, 30, 15, 10] }],
+                            series: [{
+                                name: '% Users', data: [
+                                <%= stats.streak.total_streak_3_day %>, 
+                                <%= stats.streak.total_streak_7_day %>, 
+                                <%= stats.streak.total_streak_14_day %>, 
+                                <%= stats.streak.total_streak_30_day %>]
+                            }],
                             xaxis: { categories: ['3-day', '7-day', '14-day', '30-day'] },
                             colors: ['#20c997'],
                             tooltip: { y: { formatter: val => `${val}% (${Math.floor(val * 50)} users)` } }

@@ -84,7 +84,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#007bff; border:none; border-radius:10px; overflow:hidden;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1">1,250</h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= stats.invitesSent %>
+                                    </h3>
                                     <p class="mb-0">Invites Sent</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -99,7 +101,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#28a745; border:none; border-radius:10px;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1">860</h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= stats.accepted %>
+                                    </h3>
                                     <p class="mb-0">Invites Accepted</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -114,7 +118,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#ffc107; border:none; border-radius:10px;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1">540</h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= stats.activated %>
+                                    </h3>
                                     <p class="mb-0">Activations</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -129,7 +135,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#dc3545; border:none; border-radius:10px;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1">65</h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= stats.userLinked %>
+                                    </h3>
                                     <p class="mb-0">Linked Partners</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -361,6 +369,7 @@
                     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
                     <script>
                         // ---------- Referral Funnel ----------
+                        // ---------- Referral Funnel ----------
                         var referralFunnelOptions = {
                             chart: { type: 'bar', height: 180 },
                             plotOptions: { bar: { horizontal: true, distributed: true, barHeight: '60%', dataLabels: { position: 'bottom' } } },
@@ -385,8 +394,18 @@
                                     }
                                 }
                             },
-                            series: [{ name: 'Users', data: [1250, 860, 540, 65] }]
+
+                            series: [{
+                                name: 'Users',
+                                data: [
+                                    <%= stats.invitesSent %>,
+                                    <%= stats.accepted %>,
+                                    <%= stats.activated %>,
+                                    <%= stats.userLinked %>
+                                    ],
+                            }]
                         };
+
                         new ApexCharts(document.querySelector("#referralFunnel"), referralFunnelOptions).render();
 
                         // ---------- Signup Flow Funnel ----------
@@ -414,7 +433,14 @@
                                     }
                                 }
                             },
-                            series: [{ name: 'Users', data: [2000, 1400, 900, 500] }]
+                            series: [{
+                                name: 'Users', data: [
+    <%= stats.landing %>,
+    <%= stats.signup %>,
+    <%= stats.onboarding %>,
+    <%= stats.firstLog %>
+]
+                            }]
                         };
                         new ApexCharts(document.querySelector("#signupFunnel"), signupFunnelOptions).render();
 
@@ -568,63 +594,6 @@
             <!--end::App Content-->
         </main>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-
-                const searchInput = document.getElementById("refSearch");
-                const roleSelect = document.getElementById("refRole");
-                const rangeSelect = document.getElementById("refRange");
-
-                const rows = document.querySelectorAll("tbody tr");
-
-                function applyFilters() {
-                    const searchValue = searchInput.value.toLowerCase();
-                    const roleValue = roleSelect.value;
-                    const rangeValue = rangeSelect.value;
-
-                    const now = new Date();
-
-                    rows.forEach(row => {
-                        const name = row.cells[1].textContent.toLowerCase();
-                        const role = row.cells[2].textContent.trim().toLowerCase();
-                        const referralCount = parseInt(row.cells[3].textContent, 10) || 0;
-
-                        let visible = true;
-
-  
-                        if (!name.includes(searchValue)) {
-                            visible = false;
-                        }
-
-
-                        if (roleValue === "Users" && role !== "user") {
-                            visible = false;
-                        }
-                        if (roleValue === "Partners" && role !== "partner") {
-                            visible = false;
-                        }
-
-                        
-                        if (rangeValue === "Last 7 Days" && referralCount === 0) {
-                            visible = false;
-                        }
-                        if (rangeValue === "Last 30 Days" && referralCount === 0) {
-                            visible = false;
-                        }
-                       
-
-                        row.style.display = visible ? "" : "none";
-                    });
-                }
-
-                searchInput.addEventListener("keyup", applyFilters);
-                roleSelect.addEventListener("change", applyFilters);
-                rangeSelect.addEventListener("change", applyFilters);
-
-            });
-        </script>
-
-
         <!-- Generate code -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -650,8 +619,64 @@
                     setTimeout(() => input.classList.remove("border-success"), 600);
                 });
             });
+
+
         </script>
 
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
 
+                const searchInput = document.getElementById("refSearch");
+                const roleSelect = document.getElementById("refRole");
+                const rangeSelect = document.getElementById("refRange");
+
+                const rows = document.querySelectorAll("tbody tr");
+
+                function applyFilters() {
+                    const searchValue = searchInput.value.toLowerCase();
+                    const roleValue = roleSelect.value;
+                    const rangeValue = rangeSelect.value;
+
+                    const now = new Date();
+
+                    rows.forEach(row => {
+                        const name = row.cells[1].textContent.toLowerCase();
+                        const role = row.cells[2].textContent.trim().toLowerCase();
+                        const referralCount = parseInt(row.cells[3].textContent, 10) || 0;
+
+                        let visible = true;
+
+
+                        if (!name.includes(searchValue)) {
+                            visible = false;
+                        }
+
+
+                        if (roleValue === "Users" && role !== "user") {
+                            visible = false;
+                        }
+                        if (roleValue === "Partners" && role !== "partner") {
+                            visible = false;
+                        }
+
+
+                        if (rangeValue === "Last 7 Days" && referralCount === 0) {
+                            visible = false;
+                        }
+                        if (rangeValue === "Last 30 Days" && referralCount === 0) {
+                            visible = false;
+                        }
+
+
+                        row.style.display = visible ? "" : "none";
+                    });
+                }
+
+                searchInput.addEventListener("keyup", applyFilters);
+                roleSelect.addEventListener("change", applyFilters);
+                rangeSelect.addEventListener("change", applyFilters);
+
+            });
+        </script>
 
         <%- include("../components/adminFooter") %>

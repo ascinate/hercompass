@@ -8,6 +8,7 @@ import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import growthRoutes from "./routes/growthRoutes.js";
+import engagementRoutes from "./routes/engagementRoutes.js";
 
 
 
@@ -77,21 +78,6 @@ app.get("/add-user", (req, res) => {
   });
 });
 
-
- 
-app.get("/engagement", (req, res) => {
-  const admin = req.session.admin;
- 
-  if (!admin) {
-    return res.redirect("/login");
-  }
- 
-  res.render("admin/engagement", {
-    title: "Dashboard",
-    admin,
-  });
-});
-
 app.get("/cpstools", (req, res) => {
   const admin = req.session.admin;
  
@@ -124,6 +110,7 @@ app.use("/api/admins", adminRoutes);
 
 app.use("/dashboard", dashboardRoutes);
 app.use("/growth", growthRoutes);
+app.use("/engagement", engagementRoutes);
 
 
 
