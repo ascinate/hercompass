@@ -184,7 +184,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary">Send Message</button>
                         <button type="button" class="btn btn-success">Trigger Digest</button>
-                        <button type="button" class="btn btn-info">Export Anonymized Report</button>
+                        <button id="exportAnonBtn" type="button" class="btn btn-info">Export Anonymized Report</button>
                         <button type="button" class="btn btn-warning">Revoke Partner Access</button>
                         <button type="button" class="btn btn-secondary">Impersonate (Support Only)</button>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -321,6 +321,8 @@
                     document.getElementById("modalUserSubscription").textContent = user.subscription_status || "-";
                     document.getElementById("modalUserCreated").textContent = formatDateTime(user.created_at);
                     document.getElementById("modalUserLastActive").textContent = formatDateTime(user.last_active);
+                    const exportBtn = document.getElementById("exportAnonBtn");
+                    exportBtn.dataset.userId = user.id;
 
                     document.getElementById("modalPartnerLinked").textContent =
                         p?.partner_id ? "Yes" : "No";
@@ -363,20 +365,22 @@
                         forecastsBody.innerHTML = data.forecasts
                             .map(
                                 (f) => `
-                <tr>
-                    <td>${formatDateTime(f.date)}</td>
-                    <td>${JSON.stringify(f.forecast)}</td>
-                    <td>${f.confidence ?? "-"}</td>
-                </tr>
+                                <tr>
+                                    <td>${formatDateTime(f.date)}</td>
+                                    <td>${JSON.stringify(f.forecast)}</td>
+                                    <td>${f.confidence ?? "-"}</td>
+                                </tr>
             `
                             )
                             .join("");
-                    } else {
-                        forecastsBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-muted">No forecasts found.</td>
-                </tr>`;
-                    }
+                        } else {
+                                forecastsBody.innerHTML = `
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No forecasts found.</td>
+                        </tr>`;
+                            }
+
+
 
                     modal.show();
                 }
@@ -404,6 +408,14 @@
             });
         </script>
 
+        <script>
+        document.addEventListener("click", function (e) {
+            if (e.target.id === "exportAnonBtn") {
+                const userId = e.target.dataset.userId;
+                window.location.href = `/api/users/${userId}/export/anonymized`;
+            }
+        });
+        </script>
 
 
 

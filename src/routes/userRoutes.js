@@ -11,6 +11,7 @@ import {
   logoutUser,
   registerWithOnboarding,
   exportUsers,
+  exportAnonymizedReport,
 } from "../controllers/userController.js";
 import { getUserMetrics } from "../controllers/metricsController.js";
 
@@ -31,6 +32,8 @@ router.post("/update/:id", updateUser);
 router.get("/delete/:id", deleteUser);
 router.get("/metrics", getUserMetrics);
 router.get("/export", exportUsers);
+router.get("/:id/export/anonymized", exportAnonymizedReport);
+
 
 
 

@@ -272,14 +272,14 @@
 
                                     <!-- Filters & Search moved to header -->
                                     <div class="leaderboard-filters flex-grow-1 justify-content-end">
-                                        <input type="text" class="form-control form-control-sm w-auto"
+                                        <input id="refSearch" type="text" class="form-control form-control-sm w-auto"
                                             placeholder="Search...">
-                                        <select class="form-select form-select-sm w-auto">
+                                        <select id="refRole" class="form-select form-select-sm w-auto">
                                             <option>All Roles</option>
                                             <option>Users</option>
                                             <option>Partners</option>
                                         </select>
-                                        <select class="form-select form-select-sm w-auto">
+                                        <select id="refRange" class="form-select form-select-sm w-auto">
                                             <option>Last 7 Days</option>
                                             <option>Last 30 Days</option>
                                             <option>All Time</option>
@@ -288,9 +288,10 @@
                                 </div>
 
                                 <div class="dashboard-body">
-                                    <div class="table-responsive leaderboard-table">
+                                    <!-- Dynamic height: table scrolls, header fixed -->
+                                    <div class="table-responsive" style="max-height: 50vh; overflow-y: auto;">
                                         <table class="table table-sm table-striped align-middle mb-0">
-                                            <thead class="table-light">
+                                            <thead class="table-light" style="position: sticky; top: 0; z-index: 5;">
                                                 <tr>
                                                     <th>Rank</th>
                                                     <th>Name</th>
@@ -301,47 +302,56 @@
                                                     <th>CPS</th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
-                                                <tr>
-                                                    <td><i class="bi bi-1-circle-fill" style="color: #ffc107;"></i></td>
-                                                    <td>Alisa</td>
-                                                    <td><span class="badge bg-primary">User</span></td>
-                                                    <td>120</td>
-                                                    <td>90</td>
-                                                    <td>12</td>
-                                                    <td>₹250</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><i class="bi bi-2-circle-fill" style="color: #adadad;"></i></td>
-                                                    <td>Harry</td>
-                                                    <td><span class="badge bg-success">Partner</span></td>
-                                                    <td>250</td>
-                                                    <td>180</td>
-                                                    <td>40</td>
-                                                    <td>₹190</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><i class="bi bi-3-circle-fill" style="color: #9e5e29;"></i></td>
-                                                    <td>Peater</td>
-                                                    <td><span class="badge bg-success">Partner</span></td>
-                                                    <td>200</td>
-                                                    <td>140</td>
-                                                    <td>32</td>
-                                                    <td>₹175</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>4</td>
-                                                    <td>Lisa</td>
-                                                    <td><span class="badge bg-primary">User</span></td>
-                                                    <td>160</td>
-                                                    <td>110</td>
-                                                    <td>28</td>
-                                                    <td>₹160</td>
-                                                </tr>
+                                                <% leaderboard.forEach((row, index)=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <% if (index===0) { %>
+                                                                <i class="bi bi-1-circle-fill"
+                                                                    style="color:#ffc107;"></i>
+                                                                <% } else if (index===1) { %>
+                                                                    <i class="bi bi-2-circle-fill"
+                                                                        style="color:#adadad;"></i>
+                                                                    <% } else if (index===2) { %>
+                                                                        <i class="bi bi-3-circle-fill"
+                                                                            style="color:#9e5e29;"></i>
+                                                                        <% } else { %>
+                                                                            <%= index + 1 %>
+                                                                                <% } %>
+                                                        </td>
+
+                                                        <td>
+                                                            <%= row.full_name %>
+                                                        </td>
+
+                                                        <td>
+                                                            <% if (row.role==="partner" ) { %>
+                                                                <span class="badge bg-success">Partner</span>
+                                                                <% } else { %>
+                                                                    <span class="badge bg-primary">User</span>
+                                                                    <% } %>
+                                                        </td>
+
+                                                        <td>
+                                                            <%= row.referrals_sent %>
+                                                        </td>
+                                                        <td>
+                                                            <%= row.activated_count %>
+                                                        </td>
+                                                        <td>
+                                                            <%= row.linked_partners %>
+                                                        </td>
+                                                        <td>₹<%= row.cps %>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -558,6 +568,63 @@
             <!--end::App Content-->
         </main>
 
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+
+                const searchInput = document.getElementById("refSearch");
+                const roleSelect = document.getElementById("refRole");
+                const rangeSelect = document.getElementById("refRange");
+
+                const rows = document.querySelectorAll("tbody tr");
+
+                function applyFilters() {
+                    const searchValue = searchInput.value.toLowerCase();
+                    const roleValue = roleSelect.value;
+                    const rangeValue = rangeSelect.value;
+
+                    const now = new Date();
+
+                    rows.forEach(row => {
+                        const name = row.cells[1].textContent.toLowerCase();
+                        const role = row.cells[2].textContent.trim().toLowerCase();
+                        const referralCount = parseInt(row.cells[3].textContent, 10) || 0;
+
+                        let visible = true;
+
+  
+                        if (!name.includes(searchValue)) {
+                            visible = false;
+                        }
+
+
+                        if (roleValue === "Users" && role !== "user") {
+                            visible = false;
+                        }
+                        if (roleValue === "Partners" && role !== "partner") {
+                            visible = false;
+                        }
+
+                        
+                        if (rangeValue === "Last 7 Days" && referralCount === 0) {
+                            visible = false;
+                        }
+                        if (rangeValue === "Last 30 Days" && referralCount === 0) {
+                            visible = false;
+                        }
+                       
+
+                        row.style.display = visible ? "" : "none";
+                    });
+                }
+
+                searchInput.addEventListener("keyup", applyFilters);
+                roleSelect.addEventListener("change", applyFilters);
+                rangeSelect.addEventListener("change", applyFilters);
+
+            });
+        </script>
+
+
         <!-- Generate code -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -584,6 +651,7 @@
                 });
             });
         </script>
+
 
 
         <%- include("../components/adminFooter") %>

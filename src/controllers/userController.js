@@ -4,6 +4,9 @@ import { Op } from "sequelize";
 import sequelize from "../config/db.js";
 import { QueryTypes } from "sequelize";
 import { Parser } from "json2csv";
+import PDFDocument from "pdfkit";
+
+
 
 
 // 🟢 Get all users
@@ -411,4 +414,85 @@ export const exportUsers = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to export users" });
   }
 };
+
+
+
+export const exportAnonymizedReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+    if (!user) return res.status(404).send("User not found");
+
+    const cleanName = user.full_name.replace(/\s+/g, "-");
+    const filename = `${cleanName}-anonymized.pdf`;
+
+    // Mask email
+    const maskEmail = (email) => {
+      const [name, domain] = email.split("@");
+      return name[0] + "***@" + domain;
+    };
+
+    // Fetch logs (last 30 days)
+    const logs = await sequelize.query(
+      `
+      SELECT 'activity' AS type, activity_type AS label, logged_at AS date
+      FROM activity_logs WHERE user_id = :id AND logged_at >= NOW() - INTERVAL '30 days'
+
+      UNION ALL
+
+      SELECT 'symptom', symptoms::text AS label, log_date AS date
+      FROM symptom_logs WHERE user_id = :id AND log_date >= NOW() - INTERVAL '30 days'
+
+      UNION ALL
+
+      SELECT 'meditation', session_type AS label, completed_at AS date
+      FROM meditations WHERE user_id = :id AND completed_at >= NOW() - INTERVAL '30 days'
+      ORDER BY date DESC
+      `,
+      { replacements: { id }, type: QueryTypes.SELECT }
+    );
+
+    // Create PDF
+    const doc = new PDFDocument();
+    
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+    doc.pipe(res);
+
+    // ----- PDF CONTENT ------
+    doc.fontSize(20).text("Anonymized User Report", { underline: true });
+    doc.moveDown(1);
+
+    doc.fontSize(12).text(`User Identifier: USER-${id.slice(0, 4).toUpperCase()}`);
+    doc.text(`Email: ${maskEmail(user.email)}`);
+    doc.text(`Role: ${user.role}`);
+    doc.text(`Subscription Status: ${user.subscription_status}`);
+    doc.moveDown(1);
+
+    doc.fontSize(16).text("Engagement Summary", { underline: true });
+    doc.moveDown(0.5);
+
+    doc.fontSize(12).text(`Logs in last 30 days: ${logs.length}`);
+    doc.text(`Last Active: ${user.last_active ? user.last_active.toDateString() : "Unknown"}`);
+    doc.moveDown(1);
+
+    doc.fontSize(16).text("Recent Logs (30 Days)", { underline: true });
+    doc.moveDown(0.5);
+
+    logs.forEach((log, i) => {
+      doc.fontSize(12).text(
+        `${i + 1}. [${log.type.toUpperCase()}] ${log.label} — ${new Date(log.date).toDateString()}`
+      );
+    });
+
+    doc.end();
+
+  } catch (err) {
+    console.error("Anonymized export error:", err);
+    res.status(500).send("Failed to generate anonymized report");
+  }
+};
+
 
