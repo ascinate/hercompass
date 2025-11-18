@@ -491,7 +491,7 @@ export const exportAnonymizedReport = async (req, res) => {
 
   } catch (err) {
     console.error("Anonymized export error:", err);
-    res.status(500).send("Failed to generate anonymized report");
+    res.status(500).send("Failed to generate anonymize report");
   }
 };
 
