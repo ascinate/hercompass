@@ -121,9 +121,9 @@ export const loginUser = async (req, res) => {
       });
     }
 
-if (user.password !== password) {
-  return res.status(401).json({ success: false, message: "Invalid credentials" });
-}
+    if (user.password !== password) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
 
 
     const token = jwt.sign(
@@ -151,8 +151,6 @@ if (user.password !== password) {
   }
 };
 
-
-// 🔴 Logout user and redirect to login
 export const logoutUser = async (req, res) => {
   try {
     if (req.session && req.session.user) {
