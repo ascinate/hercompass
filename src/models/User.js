@@ -79,6 +79,76 @@ const User = sequelize.define(
       defaultValue: false,
     },
 
+     health_concerns: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    medical_conditions: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    hormone_therapy_status: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    allergies: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    energy_after_meal_rating: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+
+    mood_baseline: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
+
+    emotional_goals: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    meditation_frequency: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    activity_level: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    exercise_preferences: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    weekly_exercise: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    daily_checkin_opt_in: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+
+    preferred_recommendations: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+    },
+
+    phone: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
     created_at: {
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW,

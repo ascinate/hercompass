@@ -57,7 +57,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#17a2b8; border:none; border-radius:10px; overflow:hidden;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1"><%= metrics.partners %></h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= metrics.partners %>
+                                    </h3>
                                     <p class="mb-0">Number of Partners</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -72,7 +74,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#6f42c1; border:none; border-radius:10px;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1"><%= metrics.activationRate %>%</h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= metrics.activationRate %>%
+                                    </h3>
                                     <p class="mb-0">Partner Activation Rate</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -87,7 +91,9 @@
                             <div class="card text-white position-relative"
                                 style="background-color:#20c997; border:none; border-radius:10px;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1"><%= metrics.recentOpenRate %>%</h3>
+                                    <h3 class="fw-bold mb-1">
+                                        <%= metrics.recentOpenRate %>%
+                                    </h3>
                                     <p class="mb-0">Digest Open Rate</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -101,7 +107,9 @@
                             <div class="card text-danger position-relative"
                                 style="background-color:#ffcccc; border:none; border-radius:10px;">
                                 <div class="card-body">
-                                    <h3 class="fw-bold mb-1"><i class="bi bi-arrow-down"></i><%= metrics.openRateDrop %>%</h3>
+                                    <h3 class="fw-bold mb-1"><i class="bi bi-arrow-down"></i>
+                                        <%= metrics.openRateDrop %>%
+                                    </h3>
                                     <p class="mb-0">Digest Open Rate Drops</p>
                                     <span class="position-absolute top-50 end-0 translate-middle-y me-3"
                                         style="font-size:3rem; opacity:0.3;">
@@ -110,7 +118,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
 
 
@@ -156,46 +164,57 @@
                                             </tr>
                                         </thead>
                                         <tbody id="consentTableBody">
-                                            <tr>
-                                                <td>U001</td>
-                                                <td>P001</td>
-                                                <td>email, profile</td>
-                                                <td>2025-11-10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>U002</td>
-                                                <td>P002</td>
-                                                <td>email</td>
-                                                <td>2025-11-11</td>
-                                            </tr>
-                                            <tr>
-                                                <td>U003</td>
-                                                <td>P001</td>
-                                                <td>profile, transactions</td>
-                                                <td>2025-11-12</td>
-                                            </tr>
+                                            <% if (consents && consents.length) { %>
+                                                <% consents.forEach(c=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= c.user_id %>
+                                                        </td>
+                                                        <td>
+                                                            <%= c.partner_id %>
+                                                        </td>
+
+                                                        <td>
+                                                            <% if (Array.isArray(c.shared_fields)) { %>
+                                                                <%= c.shared_fields.join(", ") %>
+                        <% } else { %>
+                            <%= c.shared_fields %>
+                        <% } %>
+                    </td>
+
+                    <td><%= new Date(c.last_shared).toISOString().slice(0, 10) %></td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan=" 4" class="text-center text-muted">No consent records found.
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
                                         </tbody>
                                     </table>
+
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
             </div>
-            
+
         </main>
 
-        
+
         <script>
-             document.getElementById('partnerFilter').addEventListener('input', function () {
+            document.getElementById('partnerFilter').addEventListener('input', function () {
                 const filter = this.value.toLowerCase();
                 const rows = document.querySelectorAll('#consentTableBody tr');
                 rows.forEach(row => {
                     const partnerId = row.cells[1].textContent.toLowerCase();
                     row.style.display = partnerId.includes(filter) ? '' : 'none';
-                    });
                 });
+            });
         </script>
 
 

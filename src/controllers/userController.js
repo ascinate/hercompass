@@ -5,6 +5,7 @@ import sequelize from "../config/db.js";
 import { QueryTypes } from "sequelize";
 import { Parser } from "json2csv";
 import PDFDocument from "pdfkit";
+import jwt from "jsonwebtoken";
 
 
 
@@ -125,17 +126,21 @@ if (user.password !== password) {
 }
 
 
-    req.session.user = {
-      id: user.id,
-      name: user.full_name,
-      role: user.role,
-      email: user.email,
-    };
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.JWT_SECRET || "supersecretkey999",
+      { expiresIn: "7d" }
+    );
 
     res.status(200).json({
       success: true,
       message: "Login successful",
       user,
+      token
     });
   } catch (error) {
     console.error("❌ Login error:", error.message);
@@ -218,7 +223,7 @@ export const getAdminsAndOthers = async (req, res) => {
     });
   }
 };
-// Additional controller functions (createUser, updateUser, deleteUser) can be added here as needed.
+
 
 
 export const createUser = async (req, res) => {
@@ -273,66 +278,100 @@ export const createUser = async (req, res) => {
 };
 
 
-
 export const registerWithOnboarding = async (req, res) => {
   try {
     const {
       full_name,
       email,
       password,
-      gender,
+      phone,
+      age,
       menopause_phase,
-      diet_style,
-      fitness_level,
-      moods,
-      goals,
-      invite_partner_email,
-      invite_partner_consent,
+      health_concerns,
+      medical_conditions,
+      hormone_therapy_status,
+      diet_preferences,
+      allergies,
+      energy_after_meal_rating,
+      mood_baseline,
+      emotional_goals,
+      meditation_frequency,
+      activity_level,
+      exercise_preferences,
+      weekly_exercise,
+      daily_checkin_opt_in,
+      preferred_recommendations,
     } = req.body;
-
-    // Check required fields
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required" });
+    if (!email || !password || !full_name) {
+      return res.status(400).json({
+        success: false,
+        message: "Full name, email & password are required."
+      });
     }
 
-    // Prevent duplicate
     const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(409).json({ success: false, message: "Email already exists" });
-    }
 
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists"
+      });
+    }
     const newUser = await User.create({
       full_name,
       email,
       password,
-      gender,
-      menopause_phase,
-      diet_preferences: [diet_style],
-      fitness_level,
-      moods,
-      goals,
-      invite_partner_email,
-      invite_partner_consent,
+      phone,
+      age,
+      menopause_phase: menopause_phase,
+      health_concerns: health_concerns || [],
+      medical_conditions: medical_conditions || null,
+      hormone_therapy_status: hormone_therapy_status || null,
+
+      diet_preferences: diet_preferences || [],
+      allergies: allergies || null,
+      energy_after_meal_rating: energy_after_meal_rating
+        ? Number(energy_after_meal_rating)
+        : null,
+
+      mood_baseline: mood_baseline || {},
+      emotional_goals: emotional_goals || [],
+      meditation_frequency: meditation_frequency || null,
+
+      activity_level: activity_level || null,
+      exercise_preferences: exercise_preferences || [],
+      weekly_exercise: weekly_exercise || null,
+
+      daily_checkin_opt_in: daily_checkin_opt_in ?? true,
+      preferred_recommendations: preferred_recommendations || [],
+
       role: "user",
     });
 
-    res.status(201).json({
+
+    return res.status(201).json({
       success: true,
-      message: "User registered + onboarded successfully",
+      message: "User registered with full onboarding successfully",
       user: newUser,
     });
+
+
   } catch (error) {
-    console.error("❌ Registration + Onboarding error:", error.message);
-    res.status(500).json({ success: false, message: "Server error while onboarding user" });
+    console.error("❌ Full onboarding error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while onboarding"
+    });
   }
 };
+
 
 export const updateUser = async (req, res) => {
   const userId = req.params.id;
   try {
     const {
       full_name,
-      email,
+      email, 
       password,
       gender,
       role,
