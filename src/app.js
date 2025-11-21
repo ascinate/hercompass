@@ -29,10 +29,7 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://progressive-hercompass.vercel.app"
-    ],
+    origin:"*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
