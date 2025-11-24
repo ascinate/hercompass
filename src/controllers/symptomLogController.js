@@ -1,4 +1,5 @@
 import SymptomLog from "../models/SymptomLog.js";
+import { runPredictionEngine } from "../services/aiPredictionService.js";
 
 export const addSymptomLog = async (req, res) => {
   try {
@@ -21,10 +22,10 @@ export const addSymptomLog = async (req, res) => {
       symptoms,
       notes,
     });
-
+   await runPredictionEngine(userId);
     res.status(201).json({
       success: true,
-      message: "Log saved successfully",
+      message: "Log saved + AI prediction updated",
       data: newLog,
     });
 
