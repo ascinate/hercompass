@@ -10,6 +10,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import growthRoutes from "./routes/growthRoutes.js";
 import engagementRoutes from "./routes/engagementRoutes.js";
 import cpstoolsRoutes from "./routes/cpstoolsRoutes.js";
+import symptomLogRoutes from "./routes/symptomLogRoutes.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -105,5 +106,8 @@ app.use("/dashboard", dashboardRoutes);
 app.use("/growth", growthRoutes);
 app.use("/engagement", engagementRoutes);
 app.use("/cpstools", cpstoolsRoutes);
+
+app.use("/api/logs", symptomLogRoutes);
+
 
 export default app;
