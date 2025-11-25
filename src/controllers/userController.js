@@ -299,6 +299,8 @@ export const registerWithOnboarding = async (req, res) => {
       weekly_exercise,
       daily_checkin_opt_in,
       preferred_recommendations,
+      partner_email,
+      partner_consent,
     } = req.body;
     if (!email || !password || !full_name) {
       return res.status(400).json({
@@ -342,6 +344,8 @@ export const registerWithOnboarding = async (req, res) => {
 
       daily_checkin_opt_in: daily_checkin_opt_in ?? true,
       preferred_recommendations: preferred_recommendations || [],
+      partner_email: partner_email || null,
+      partner_consent: partner_consent || false,
 
       role: "user",
     });
