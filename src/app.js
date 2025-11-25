@@ -28,29 +28,15 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
     exposedHeaders: ["Content-Length"],
     credentials: true,
-    preflightContinue: false
   })
 );
 
-// Ensure Express always answers OPTIONS immediately
+
 app.options("*", cors());
 
-// Fallback — if something upstream strips CORS headers, use this as last resort
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://progressive-hercompass.vercel.app");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
-});
-
-
-// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session after CORS and body parsers
 app.use(
   session({
     secret: "super-secret-key",
