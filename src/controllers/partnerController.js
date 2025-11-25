@@ -3,15 +3,12 @@ import nodemailer from 'nodemailer';
 import PartnerInvite from '../models/PartnerInvite.js';
 import User from '../models/User.js';
 
-
 const createTransport = () => {
     return nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === 'true',
+        service: "gmail",
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
         },
     });
 };
@@ -28,9 +25,9 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
         status: "pending"
     });
 
-    // send email (BEST EFFORT ONLY)
     try {
         const transporter = createTransport();
+
         const acceptUrl = `${process.env.APP_URL}/partner/accept?token=${token}`;
 
         const html = `
@@ -41,17 +38,19 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
         `;
 
         await transporter.sendMail({
-            from: process.env.FROM_EMAIL || process.env.SMTP_USER,
+            from: process.env.FROM_EMAIL || process.env.EMAIL_USER,
             to: partner_email,
             subject: "HerCompass Partner Invitation",
             html,
         });
+
     } catch (err) {
         console.error("❌ Invite email failed:", err.message);
     }
 
     return invite;
 };
+
 
 // ------------------------
 // VALIDATE TOKEN
