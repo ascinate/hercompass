@@ -6,6 +6,7 @@ import { QueryTypes } from "sequelize";
 import { Parser } from "json2csv";
 import PDFDocument from "pdfkit";
 import jwt from "jsonwebtoken";
+import { createPartnerInvite } from './partnerController.js';
 
 
 
@@ -56,7 +57,7 @@ export const getUserById = async (req, res) => {
 
     const partnerData = partnerScopes.length ? partnerScopes[0] : null;
 
-     const logs = await sequelize.query(
+    const logs = await sequelize.query(
       `
       SELECT 'activity' AS type, activity_type AS label, logged_at AS date
       FROM activity_logs WHERE user_id = :id AND logged_at >= NOW() - INTERVAL '30 days'
@@ -93,7 +94,7 @@ export const getUserById = async (req, res) => {
     );
 
     // Return everything
-    res.json({ success: true, user,logs,forecasts, partner_scopes: partnerData, });
+    res.json({ success: true, user, logs, forecasts, partner_scopes: partnerData, });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error" });
@@ -245,7 +246,7 @@ export const createUser = async (req, res) => {
       return res.status(409).json({ success: false, message: "Email already exists" });
     }
 
-   const finalPassword = password;
+    const finalPassword = password;
 
     const newUser = await User.create({
       full_name,
@@ -350,6 +351,15 @@ export const registerWithOnboarding = async (req, res) => {
       role: "user",
     });
 
+    if (partner_email && partner_consent) {
+      try {
+        await createPartnerInvite(newUser.id, partner_email);
+      } catch (err) {
+        console.error("❌ Auto-invite failed:", err.message);
+      }
+    }
+
+
 
     return res.status(201).json({
       success: true,
@@ -373,7 +383,7 @@ export const updateUser = async (req, res) => {
   try {
     const {
       full_name,
-      email, 
+      email,
       password,
       gender,
       role,
@@ -496,7 +506,7 @@ export const exportAnonymizedReport = async (req, res) => {
 
     // Create PDF
     const doc = new PDFDocument();
-    
+
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=${filename}`);

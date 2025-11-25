@@ -12,6 +12,7 @@ import engagementRoutes from "./routes/engagementRoutes.js";
 import cpstoolsRoutes from "./routes/cpstoolsRoutes.js";
 import symptomLogRoutes from "./routes/symptomLogRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import partnerRoutes from './routes/partnerRoutes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -98,6 +99,7 @@ app.use("/api/logs", symptomLogRoutes);
 
 app.use("/api/ai", aiRoutes);
 
+app.use('/api/partner', partnerRoutes);
 
 
 export default app;
