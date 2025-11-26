@@ -353,6 +353,7 @@ export const registerWithOnboarding = async (req, res) => {
       role: "user",
     });
     if (partner_email && partner_consent) {
+      console.log("📨 Partner consent detected. Sending invite...");
       try {
         await transporter.sendMail({
           from: process.env.EMAIL_USER,
