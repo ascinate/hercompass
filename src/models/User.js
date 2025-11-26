@@ -23,6 +23,7 @@ const User = sequelize.define(
     },
     menopause_phase: {
       type: DataTypes.ENUM("peri", "menopause", "post"),
+      allowNull: true,
     },
     role: {
       type: DataTypes.STRING,

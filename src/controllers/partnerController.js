@@ -18,7 +18,8 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
     });
 
     try {
-        const acceptUrl = `${process.env.APP_URL}/partner/accept?token=${token}`;
+        const inviter = await User.findByPk(inviter_id);
+        const acceptUrl = `${process.env.APP_URL}/accepted?token=${token}&name=${encodeURIComponent(inviter.full_name)}`;
 
         const html = `
             <p>You have been invited to join HerCompass as a partner.</p>
