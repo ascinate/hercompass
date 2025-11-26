@@ -1,17 +1,9 @@
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 import PartnerInvite from '../models/PartnerInvite.js';
 import User from '../models/User.js';
+import { transporter } from "../utils/mailTransporter.js";
 
-const createTransport = () => {
-    return nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-};
+
 
 export const createPartnerInvite = async (inviter_id, partner_email) => {
     const token = crypto.randomBytes(24).toString("hex");
@@ -26,11 +18,7 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
     });
 
     try {
-        const transporter = createTransport();
         await transporter.verify();
-        console.log("📨 SMTP connection OK");
-
-
         const acceptUrl = `${process.env.APP_URL}/partner/accept?token=${token}`;
 
         const html = `

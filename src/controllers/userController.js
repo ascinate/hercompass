@@ -351,7 +351,7 @@ export const registerWithOnboarding = async (req, res) => {
       role: "user",
     });
 
-    if (partner_email && partner_consent) {
+    if (partner_email) {
       try {
         await createPartnerInvite(newUser.id, partner_email);
       } catch (err) {

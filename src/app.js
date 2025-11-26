@@ -13,6 +13,7 @@ import cpstoolsRoutes from "./routes/cpstoolsRoutes.js";
 import symptomLogRoutes from "./routes/symptomLogRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import partnerRoutes from './routes/partnerRoutes.js';
+import { transporter } from "./utils/mailTransporter.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -94,12 +95,26 @@ app.use("/dashboard", dashboardRoutes);
 app.use("/growth", growthRoutes);
 app.use("/engagement", engagementRoutes);
 app.use("/cpstools", cpstoolsRoutes);
-
 app.use("/api/logs", symptomLogRoutes);
-
 app.use("/api/ai", aiRoutes);
-
 app.use('/api/partner', partnerRoutes);
+
+
+app.get("/test-mail", async (req, res) => {
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: "sourodipshit@gmail.com",
+      subject: "SMTP TEST",
+      text: "If you see this, SMTP is working!"
+    });
+
+    res.json({ success: true, info });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
 
 
 export default app;
