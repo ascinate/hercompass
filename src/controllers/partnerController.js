@@ -15,7 +15,7 @@ const createTransport = () => {
 
 export const createPartnerInvite = async (inviter_id, partner_email) => {
     const token = crypto.randomBytes(24).toString("hex");
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     const invite = await PartnerInvite.create({
         inviter_id,
@@ -27,6 +27,9 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
 
     try {
         const transporter = createTransport();
+        await transporter.verify();
+        console.log("📨 SMTP connection OK");
+
 
         const acceptUrl = `${process.env.APP_URL}/partner/accept?token=${token}`;
 
@@ -38,7 +41,7 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
         `;
 
         await transporter.sendMail({
-            from: process.env.FROM_EMAIL || process.env.EMAIL_USER,
+            from: process.env.EMAIL_USER,
             to: partner_email,
             subject: "HerCompass Partner Invitation",
             html,

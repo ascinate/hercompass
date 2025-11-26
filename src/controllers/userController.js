@@ -358,9 +358,6 @@ export const registerWithOnboarding = async (req, res) => {
         console.error("❌ Auto-invite failed:", err.message);
       }
     }
-
-
-
     return res.status(201).json({
       success: true,
       message: "User registered with full onboarding successfully",
