@@ -18,7 +18,6 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
     });
 
     try {
-        await transporter.verify();
         const acceptUrl = `${process.env.APP_URL}/partner/accept?token=${token}`;
 
         const html = `

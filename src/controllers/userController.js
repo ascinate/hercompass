@@ -7,6 +7,8 @@ import { Parser } from "json2csv";
 import PDFDocument from "pdfkit";
 import jwt from "jsonwebtoken";
 import { createPartnerInvite } from './partnerController.js';
+import { transporter } from "../utils/mailTransporter.js";
+
 
 
 
@@ -350,14 +352,22 @@ export const registerWithOnboarding = async (req, res) => {
 
       role: "user",
     });
-
-    if (partner_email) {
+    if (partner_email && partner_consent) {
       try {
-        await createPartnerInvite(newUser.id, partner_email);
+        await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: partner_email,
+          subject: "HerCompass Partner Invitation",
+          text: `You have been invited to join HerCompass.\n\nInvitation from: ${email}`,
+        });
+
+        console.log("📨 Partner invite sent to:", partner_email);
+
       } catch (err) {
-        console.error("❌ Auto-invite failed:", err.message);
+        console.error("❌ Failed to send partner email:", err.message);
       }
     }
+
     return res.status(201).json({
       success: true,
       message: "User registered with full onboarding successfully",
