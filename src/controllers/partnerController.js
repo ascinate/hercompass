@@ -18,8 +18,7 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
     });
 
     try {
-        const inviter = await User.findByPk(inviter_id);
-        const acceptUrl = `${process.env.APP_URL}/accepted?token=${token}&name=${encodeURIComponent(inviter.full_name)}`;
+        const acceptUrl = `${process.env.APP_URL}/accepted?token=${token}`;
 
         const html = `
             <p>You have been invited to join HerCompass as a partner.</p>
@@ -43,9 +42,6 @@ export const createPartnerInvite = async (inviter_id, partner_email) => {
 };
 
 
-// ------------------------
-// VALIDATE TOKEN
-// ------------------------
 export const validateInviteToken = async (req, res) => {
     try {
         const { token } = req.params;
@@ -57,9 +53,18 @@ export const validateInviteToken = async (req, res) => {
         if (new Date(invite.expires_at) < new Date())
             return res.status(400).json({ valid: false, message: "Token expired" });
 
+        // Fetch inviter details
+        const inviter = await User.findByPk(invite.inviter_id, {
+            attributes: ["id", "full_name", "email"]
+        });
+
         return res.json({
             valid: true,
-            inviter_id: invite.inviter_id,
+            inviter: inviter ? { 
+                id: inviter.id, 
+                full_name: inviter.full_name, 
+                email: inviter.email 
+            } : null,
             partner_email: invite.partner_email,
         });
     } catch (err) {
