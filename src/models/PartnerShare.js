@@ -21,8 +21,8 @@ const PartnerShare = sequelize.define("partner_shares", {
     defaultValue: true
   },
   shared_fields: {
-     type: DataTypes.JSONB,
-     defaultValue: {},
+    type: DataTypes.ARRAY(DataTypes.TEXT),
+    defaultValue: ["mood_trend", "sleep_summary", "notes"]
   },
   last_shared: {
     type: DataTypes.DATE,
