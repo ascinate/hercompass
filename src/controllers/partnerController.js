@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import PartnerInvite from '../models/PartnerInvite.js';
 import User from '../models/User.js';
 import { transporter } from "../utils/mailTransporter.js";
+import PartnerShare from "../models/PartnerShare.js";
 
 
 
@@ -60,10 +61,10 @@ export const validateInviteToken = async (req, res) => {
 
         return res.json({
             valid: true,
-            inviter: inviter ? { 
-                id: inviter.id, 
-                full_name: inviter.full_name, 
-                email: inviter.email 
+            inviter: inviter ? {
+                id: inviter.id,
+                full_name: inviter.full_name,
+                email: inviter.email
             } : null,
             partner_email: invite.partner_email,
         });
@@ -80,11 +81,12 @@ export const acceptInvite = async (req, res) => {
     try {
         const { token, password, full_name } = req.body;
 
-        if (!token || !password)
+        if (!token || !password) {
             return res.status(400).json({
                 success: false,
                 message: "token and password required",
             });
+        }
 
         const invite = await PartnerInvite.findOne({ where: { token } });
         if (!invite)
@@ -93,6 +95,7 @@ export const acceptInvite = async (req, res) => {
         if (new Date(invite.expires_at) < new Date())
             return res.status(400).json({ success: false, message: "Invite expired" });
 
+        // Get or create partner user
         let partnerUser = await User.findOne({
             where: { email: invite.partner_email },
         });
@@ -107,6 +110,7 @@ export const acceptInvite = async (req, res) => {
         }
 
         const inviter = await User.findByPk(invite.inviter_id);
+
         if (inviter) {
             inviter.partner_id = partnerUser.id;
             inviter.partner_consent = true;
@@ -116,6 +120,24 @@ export const acceptInvite = async (req, res) => {
             await partnerUser.save();
         }
 
+        // Find or create partner share
+        let partnerShare = await PartnerShare.findOne({
+            where: {
+                user_id: inviter.id,
+                partner_id: partnerUser.id
+            }
+        });
+
+        if (!partnerShare) {
+            partnerShare = await PartnerShare.create({
+                id: crypto.randomUUID(),
+                user_id: inviter.id,
+                partner_id: partnerUser.id,
+                consent: true,
+                shared_fields: {}
+            });
+        }
+
         invite.status = "accepted";
         await invite.save();
 
@@ -123,7 +145,9 @@ export const acceptInvite = async (req, res) => {
             success: true,
             message: "Partner account created and linked",
             partner: partnerUser,
+            partnerShareId: partnerShare.id,
         });
+
     } catch (err) {
         console.error("acceptInvite error:", err);
         res.status(500).json({
@@ -132,3 +156,4 @@ export const acceptInvite = async (req, res) => {
         });
     }
 };
+

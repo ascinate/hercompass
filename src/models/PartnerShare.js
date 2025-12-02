@@ -1,3 +1,4 @@
+// src/models/PartnerShare.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
@@ -7,40 +8,25 @@ const PartnerShare = sequelize.define("partner_shares", {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-
   user_id: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true
   },
-
   partner_id: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true
   },
-
   consent: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: true
   },
-
   shared_fields: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    defaultValue: [],
+     type: DataTypes.JSONB,
+     defaultValue: {},
   },
-
   last_shared: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-
-  updated_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    defaultValue: DataTypes.NOW
   }
 }, {
   timestamps: false,
