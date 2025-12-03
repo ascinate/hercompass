@@ -1,5 +1,4 @@
 // src/jobs/digestJob.js
-
 import { Op } from "sequelize";
 import SymptomLog from "../models/SymptomLog.js";
 import PredictiveLog from "../models/PredictiveLog.js";
@@ -13,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 /**
  * Build summary for last 7 days
  */
-const buildSummaryForUser = async (userId, sharedFields = []) => {
+const buildSummaryForUser = async (userId) => {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const logs = await SymptomLog.findAll({
@@ -21,7 +20,7 @@ const buildSummaryForUser = async (userId, sharedFields = []) => {
       user_id: userId,
       log_date: { [Op.gte]: since }
     },
-    order: [["log_date", "ASC"]],
+    order: [["log_date", "ASC"]]
   });
 
   const moods = logs.map(l => Number(l.mood)).filter(Boolean);
@@ -33,20 +32,21 @@ const buildSummaryForUser = async (userId, sharedFields = []) => {
 
   const latestPredict = await PredictiveLog.findOne({
     where: { user_id: userId },
-    order: [["created_at", "DESC"]],
+    order: [["created_at", "DESC"]]
   });
 
   return {
     period: { from: since.toISOString(), to: new Date().toISOString() },
     avg_mood: avgMood,
     recent_notes: notes,
-    predictive_snapshot: latestPredict ? latestPredict.predicted_symptoms : null,
+    predictive_snapshot: latestPredict?.predicted_symptoms || null,
     logs_count: logs.length
   };
 };
 
+
 /**
- * runDigestForUser()
+ * runDigestForUser
  */
 export const runDigestForUser = async (
   userId,
@@ -63,32 +63,86 @@ export const runDigestForUser = async (
     throw new Error("No consent for this partner");
   }
 
-  const summary = await buildSummaryForUser(userId, sharedFields);
+  const summary = await buildSummaryForUser(userId);
 
-  const emailHtml = `
-    <h3>HerCompass — Weekly Digest</h3>
-    <p>Period: ${summary.period.from.slice(0, 10)} → ${summary.period.to.slice(0, 10)}</p>
+  let emailHtml = `
+<div style="font-family: 'Segoe UI', sans-serif; max-width: 640px; margin: auto; background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #eee;">
 
-    ${sharedFields.includes("mood_trend") ? `
-      <p><strong>Average Mood:</strong> ${summary.avg_mood ?? "N/A"}</p>` : ""}
+    <!-- Header -->
+    <div style="text-align: center; padding-bottom: 10px; border-bottom: 2px solid #e7d0ff;">
+        <h2 style="color: #6b2fa0; margin: 0;">HerCompass — Weekly Digest</h2>
+        <p style="color: #555; margin-top: 6px;">
+            <strong>Period:</strong> ${summary.period.from.slice(0, 10)} → ${summary.period.to.slice(0, 10)}
+        </p>
+    </div>
+`;
 
-    ${sharedFields.includes("notes") && summary.recent_notes?.length ? `
-      <p><strong>Recent Note:</strong> "${summary.recent_notes[0]}"</p>` : ""}
-
-    <hr />
-    <p><strong>Recommended Actions:</strong></p>
-    <ul>
-      <li>Maintain consistent sleep routine</li>
-      <li>Light afternoon walk improves energy</li>
-    </ul>
-  `;
-
-  if (opts.preview) {
-    return { summary, emailHtml };
+  if (sharedFields.includes("mood_trend")) {
+    emailHtml += `
+    <div style="margin-top: 20px; padding: 15px; background: #faf5ff; border-radius: 10px;">
+        <h3 style="color: #6b2fa0; margin: 0;">💜 Mood Trends</h3>
+        <p style="font-size: 15px; margin-top: 8px;">
+            <strong>Average Mood:</strong> ${summary.avg_mood ?? "N/A"}
+        </p>
+    </div>
+`;
   }
 
-  // INSERT digest_log (must include id + sent_at)
+  if (sharedFields.includes("notes") && summary.recent_notes?.length) {
+    emailHtml += `
+    <div style="margin-top: 20px; padding: 15px; background: #fff7e6; border-radius: 10px;">
+        <h3 style="color: #a36300; margin: 0;">📝 Recent Note</h3>
+        <p style="font-size: 15px; margin-top: 8px; font-style: italic; color: #333;">
+            "${summary.recent_notes[0]}"
+        </p>
+    </div>
+`;
+  }
+
+  if (sharedFields.includes("ai_prediction") && summary.predictive_snapshot) {
+    emailHtml += `
+    <div style="margin-top: 20px; padding: 15px; background: #eaf7ff; border-radius: 10px;">
+        <h3 style="color: #005a8d; margin: 0;">🤖 AI Prediction Snapshot</h3>
+        <pre style="background: #ffffff; padding: 10px; border-radius: 8px; border: 1px solid #cce7ff; font-size: 14px; margin-top: 8px;">
+${JSON.stringify(summary.predictive_snapshot, null, 2)}
+        </pre>
+    </div>
+`;
+  }
+
+  emailHtml += `
+    <div style="margin-top: 25px; padding: 20px; background: #fdf1f7; border-radius: 10px; border: 1px solid #ffd4e5;">
+        <h3 style="color: #b30059; margin: 0;">🌸 Recommended Actions</h3>
+        <ul style="font-size: 15px; color: #444; margin-top: 10px;">
+            <li>Maintain consistent sleep routine</li>
+            <li>Light afternoon walk improves energy</li>
+        </ul>
+    </div>
+
+    <p style="text-align: center; margin-top: 30px; color: #888; font-size: 13px;">
+        HerCompass • Supporting your wellness journey 💜
+    </p>
+
+</div>
+`;
+
+  // PREVIEW MODE
+  if (opts.preview) {
+    return {
+      summary: {
+        ...summary,
+        // Return only allowed fields
+        avg_mood: sharedFields.includes("mood_trend") ? summary.avg_mood : null,
+        recent_notes: sharedFields.includes("notes") ? summary.recent_notes : [],
+        predictive_snapshot: sharedFields.includes("ai_prediction") ? summary.predictive_snapshot : null
+      },
+      emailHtml
+    };
+  }
+
+  // SEND MODE
   const digestId = uuidv4();
+
   const digestEntry = await DigestLog.create({
     id: digestId,
     user_id: userId,
@@ -99,19 +153,17 @@ export const runDigestForUser = async (
   });
 
   const partner = await User.findByPk(partnerId);
-  if (!partner || !partner.email) {
-    throw new Error("Partner email missing");
-  }
+
+  if (!partner || !partner.email) throw new Error("Partner email missing");
 
   try {
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: partner.email,
       subject: "HerCompass Weekly Digest",
-      html: emailHtml,
+      html: emailHtml
     });
 
-    // AUDIT LOG (SUCCESS)
     await AuditLog.create({
       actor_id: userId,
       action: "digest_sent",
@@ -123,7 +175,6 @@ export const runDigestForUser = async (
     return { success: true, digestId, info };
 
   } catch (err) {
-    // AUDIT LOG (FAILED)
     await AuditLog.create({
       actor_id: userId,
       action: "digest_send_failed",
@@ -131,14 +182,13 @@ export const runDigestForUser = async (
       target_id: digestEntry.id,
       ip_address: "0.0.0.0"
     });
-
     throw err;
   }
 };
 
 
 /**
- * Weekly cron job
+ * Weekly Cron
  */
 export const runWeeklyDigestForAllUsers = async () => {
   const shares = await PartnerShare.findAll({ where: { consent: true } });

@@ -14,6 +14,9 @@ import symptomLogRoutes from "./routes/symptomLogRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import partnerRoutes from './routes/partnerRoutes.js';
 import consentRoutes from "./routes/consentRoutes.js";
+import userDashboardRoutes from "./routes/userDashboardRoutes.js";
+
+
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -89,6 +92,9 @@ app.get("/aimodels", (req, res) => {
 
 // API / feature routes
 app.use("/api/users", userRoutes);
+
+app.use("/api/users/dashboard", userDashboardRoutes);
+
 app.use("/api/admins", adminRoutes);
 
 app.use("/dashboard", dashboardRoutes);

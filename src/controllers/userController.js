@@ -1,5 +1,6 @@
 // src/controllers/userController.js
 import User from "../models/User.js";
+import PartnerShare from "../models/PartnerShare.js";
 import { Op } from "sequelize";
 import sequelize from "../config/db.js";
 import { QueryTypes } from "sequelize";
@@ -125,6 +126,10 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
+    // ⭐ Find partner share (if exists)
+    let partnerShare = await PartnerShare.findOne({
+      where: { user_id: user.id }
+    });
 
     const token = jwt.sign(
       {
@@ -136,12 +141,16 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Login successful",
       user,
-      token
+      token,
+
+      // ⭐ Return partner_share_id so frontend can store it
+      partner_share_id: partnerShare ? partnerShare.id : null
     });
+
   } catch (error) {
     console.error("❌ Login error:", error.message);
     res.status(500).json({
@@ -150,6 +159,7 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
 
 export const logoutUser = async (req, res) => {
   try {

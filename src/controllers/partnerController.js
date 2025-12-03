@@ -134,7 +134,7 @@ export const acceptInvite = async (req, res) => {
                 user_id: inviter.id,
                 partner_id: partnerUser.id,
                 consent: true,
-                shared_fields: {}
+                shared_fields: []
             });
         }
 

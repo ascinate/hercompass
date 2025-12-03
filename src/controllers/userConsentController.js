@@ -37,22 +37,50 @@ export const updateSharedFields = async (req, res) => {
   }
 };
 
+
 export const triggerDigestPreview = async (req, res) => {
   try {
     const userId = req.user.id;
     const { partner_share_id, send } = req.body;
-    const share = await PartnerShare.findOne({ where: { id: partner_share_id, user_id: userId } });
-    if (!share) return res.status(404).json({ success: false, message: "Not found" });
 
-    const preview = await runDigestForUser(userId, share.partner_id, share.shared_fields, { preview: true });
+    const share = await PartnerShare.findOne({
+      where: { id: partner_share_id, user_id: userId }
+    });
 
+    if (!share) {
+      return res.status(404).json({ success: false, message: "Not found" });
+    }
+
+    // Ensure array
+    const sharedFields = Array.isArray(share.shared_fields)
+      ? share.shared_fields
+      : [];
+
+    // Always preview
+    const preview = await runDigestForUser(
+      userId,
+      share.partner_id,
+      sharedFields,
+      { preview: true }
+    );
+
+    // Send if requested
     if (send) {
-      await runDigestForUser(userId, share.partner_id, share.shared_fields, { preview: false });
+      await runDigestForUser(
+        userId,
+        share.partner_id,
+        sharedFields,
+        { preview: false }
+      );
     }
 
     return res.json({ success: true, preview });
+
   } catch (err) {
     console.error("triggerDigestPreview:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 };
