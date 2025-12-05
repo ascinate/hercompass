@@ -10,6 +10,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import growthRoutes from "./routes/growthRoutes.js";
 import engagementRoutes from "./routes/engagementRoutes.js";
 import cpstoolsRoutes from "./routes/cpstoolsRoutes.js";
+import videosRoutes from "./routes/videosRoutes.js";
 import symptomLogRoutes from "./routes/symptomLogRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import partnerRoutes from './routes/partnerRoutes.js';
@@ -90,6 +91,7 @@ app.get("/aimodels", (req, res) => {
   res.render("admin/aimodels", { title: "Dashboard", admin });
 });
 
+
 // API / feature routes
 app.use("/api/users", userRoutes);
 
@@ -101,11 +103,12 @@ app.use("/dashboard", dashboardRoutes);
 app.use("/growth", growthRoutes);
 app.use("/engagement", engagementRoutes);
 app.use("/cpstools", cpstoolsRoutes);
+app.use("/videos", videosRoutes);
 app.use("/api/logs", symptomLogRoutes);
 app.use("/api/ai", aiRoutes);
 app.use('/api/partner', partnerRoutes);
 app.use("/api/consent", consentRoutes);
 
 
-
+app.use('/uploads', express.static('uploads'));
 export default app;
