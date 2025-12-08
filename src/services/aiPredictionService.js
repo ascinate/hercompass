@@ -1,4 +1,4 @@
-import PredictiveLog from "../models/predictiveLog.js";
+import PredictiveLog from "../models/PredictiveLog.js";
 import DigitalTwinScenario from "../models/digitalTwin.js";
 import SymptomLog from "../models/SymptomLog.js";
 import User from "../models/User.js";

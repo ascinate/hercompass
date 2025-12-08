@@ -1,4 +1,4 @@
-import PredictiveLog from "../models/predictiveLog.js";
+import PredictiveLog from "../models/PredictiveLog.js";
 import DigitalTwinScenario from "../models/digitalTwin.js";
 
 export const getMyPredictions = async (req, res) => {
